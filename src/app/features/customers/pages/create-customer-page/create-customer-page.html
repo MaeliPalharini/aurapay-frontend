@@ -1,0 +1,65 @@
+<div class="create-customer-page">
+  <div class="page-header">
+    <span class="eyebrow">AuraPay</span>
+    <h2>Abra sua carteira digital</h2>
+    <p>Cadastre-se para acessar sua conta, acompanhar seu saldo e movimentar seus valores com praticidade.</p>
+  </div>
+
+  <div class="customer-layout">
+    <section class="wallet-preview-card">
+      <div class="wallet-card">
+        <div class="wallet-card__shine"></div>
+
+        <div class="wallet-card__top">
+          <span class="wallet-chip">AuraPay Wallet</span>
+          <span class="wallet-tag">Nova</span>
+        </div>
+
+        <div class="wallet-card__middle">
+          <p class="wallet-label">Titular da carteira</p>
+          <h3>{{ form.value.fullName || 'Seu nome aparecerá aqui' }}</h3>
+        </div>
+
+        <div class="wallet-card__bottom">
+          <div>
+            <p class="wallet-label">Status</p>
+            <strong>Pronta para ativação</strong>
+          </div>
+
+          <div class="wallet-brand-mini">AURA PAY</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="customer-form-card">
+      <div class="form-header">
+        <h3>Seus dados</h3>
+        <p>Preencha as informações abaixo para criar sua conta.</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="form-group">
+          <label for="fullName">Nome completo</label>
+          <input id="fullName" type="text" placeholder="Digite seu nome completo" formControlName="fullName" />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input id="email" type="email" placeholder="Digite seu email" formControlName="email" />
+        </div>
+
+        <div class="form-group">
+          <label for="documentNumber">CPF ou documento</label>
+          <input id="documentNumber" type="text" placeholder="Digite seu CPF ou documento" formControlName="documentNumber" />
+        </div>
+
+        <button type="submit" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Criando conta...' : 'Criar minha conta' }}
+        </button>
+
+        <p *ngIf="successMessage">{{ successMessage }}</p>
+        <p *ngIf="errorMessage">{{ errorMessage }}</p>
+      </form>
+    </section>
+  </div>
+</div>
