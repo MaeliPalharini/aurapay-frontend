@@ -1,1 +1,23 @@
+<div class="wallet-details-page">
+  <div class="page-header">
+    <h2>Consultar carteira</h2>
+    <p>Veja os dados da carteira vinculada ao cliente.</p>
+  </div>
 
+  <div *ngIf="isLoading">
+    Carregando carteira...
+  </div>
+
+  <div *ngIf="errorMessage && !isLoading" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="wallet && !isLoading" class="wallet-result-card">
+    <h3>Carteira criada com sucesso</h3>
+
+    <p><strong>ID da carteira:</strong> {{ wallet.walletId }}</p>
+    <p><strong>ID do cliente:</strong> {{ wallet.customerId }}</p>
+    <p><strong>Saldo:</strong> {{ wallet.balance }}</p>
+    <p><strong>Status:</strong> {{ wallet.walletStatus }}</p>
+  </div>
+</div>

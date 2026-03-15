@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { CustomerApiService } from '../../../../core/api/customer-api.service';
 import { CreateCustomerResponse } from '../../models/create-customer-response.model';
 
@@ -18,7 +19,8 @@ export class CreateCustomerPage {
 
   constructor(
     private fb: FormBuilder,
-    private customerApiService: CustomerApiService
+    private customerApiService: CustomerApiService,
+    private router: Router
   ) {
     this.form = this.fb.group({
       fullName: ['', [Validators.required]],
@@ -46,8 +48,10 @@ export class CreateCustomerPage {
     this.customerApiService.createCustomer(payload).subscribe({
       next: (response: CreateCustomerResponse): void => {
         this.isSubmitting = false;
-        this.successMessage = `Conta criada com sucesso! Wallet #${response.walletId}`;
-        this.form.reset();
+
+        this.router.navigate(['/wallet'], {
+          queryParams: { customerId: response.customerId }
+        });
       },
       error: (error: any): void => {
         this.isSubmitting = false;
