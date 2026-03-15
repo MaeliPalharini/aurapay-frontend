@@ -51,7 +51,12 @@ export class CreateCustomerPage {
       },
       error: (error: any): void => {
         this.isSubmitting = false;
-        this.errorMessage = error?.error?.message || 'Não foi possível criar a conta.';
+        console.error('Erro ao criar conta:', error);
+
+        this.errorMessage =
+          error?.error?.message ||
+          error?.message ||
+          'Não foi possível criar a conta.';
       }
     });
   }
