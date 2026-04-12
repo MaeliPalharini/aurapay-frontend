@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, Validators } from '@angular/forms';
 import { CustomerApiService } from '../../../../core/api/customer-api.service';
 import { GetWalletResponse } from '../../../customers/models/get-wallet-response.model';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-wallet-details-page',
@@ -64,11 +65,13 @@ export class WalletDetailsPage implements OnInit {
     if (!this.customerId) return;
 
     this.isLoading = true;
+    this.cdr.markForCheck();
+
     this.customerApiService.getWalletByCustomerId(this.customerId).subscribe({
       next: (response: GetWalletResponse) => {
         this.wallet = response;
         this.isLoading = false;
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       },
       error: (error: any) => {
         this.errorMessage =
@@ -76,7 +79,7 @@ export class WalletDetailsPage implements OnInit {
           error?.message ||
           'Não foi possível consultar a carteira.';
         this.isLoading = false;
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       },
     });
   }
@@ -85,7 +88,11 @@ export class WalletDetailsPage implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
     this.isAddFundsOpen = true;
+    this.isSubmittingAddFunds = false;
     this.addFundsForm.reset({ amount: null });
+
+    // Garante que o modal e o form renderizem imediatamente
+    queueMicrotask(() => this.cdr.markForCheck());
   }
 
   closeAddFunds(): void {
@@ -100,26 +107,34 @@ export class WalletDetailsPage implements OnInit {
 
     if (this.addFundsForm.invalid) {
       this.errorMessage = 'Informe um valor válido para adicionar saldo.';
-      this.cdr.detectChanges();
+      this.cdr.markForCheck();
       return;
     }
 
     const amount = Number(this.addFundsForm.value.amount);
 
     this.isSubmittingAddFunds = true;
-    this.customerApiService.depositToWallet(this.customerId, amount).subscribe({
-      next: () => {
-        this.successMessage = 'Saldo adicionado com sucesso.';
-        this.isSubmittingAddFunds = false;
-        this.isAddFundsOpen = false;
-        this.loadWallet();
-        this.cdr.detectChanges();
-      },
-      error: (error: any) => {
-        this.errorMessage = error?.error?.message || error?.message || 'Não foi possível adicionar saldo.';
-        this.isSubmittingAddFunds = false;
-        this.cdr.detectChanges();
-      },
-    });
+    this.cdr.markForCheck();
+
+    this.customerApiService
+      .depositToWallet(this.customerId, amount)
+      .pipe(
+        finalize(() => {
+          this.isSubmittingAddFunds = false;
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.successMessage = 'Saldo adicionado com sucesso.';
+          this.isAddFundsOpen = false;
+          this.loadWallet();
+          this.cdr.markForCheck();
+        },
+        error: (error: any) => {
+          this.errorMessage = error?.error?.message || error?.message || 'Não foi possível adicionar saldo.';
+          this.cdr.markForCheck();
+        },
+      });
   }
 }

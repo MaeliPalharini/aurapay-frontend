@@ -5,8 +5,7 @@
     </div>
 
     <nav class="sidebar-nav">
-      <!-- Esconde "Cadastro" após o cliente já estar cadastrado (customerId salvo) -->
-      <a *ngIf="!isCustomerRegistered" routerLink="/customers/new" routerLinkActive="active">Cadastro</a>
+      <a routerLink="/customers/new" routerLinkActive="active">Início</a>
       <a routerLink="/wallet" routerLinkActive="active">Minha carteira</a>
       <a routerLink="/cofrinhos" routerLinkActive="active">Cofrinho</a>
       <a routerLink="/transfer" routerLinkActive="active">Transferências</a>

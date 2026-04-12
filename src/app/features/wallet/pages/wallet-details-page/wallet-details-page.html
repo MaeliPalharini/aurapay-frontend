@@ -1,67 +1,124 @@
-<div class="wallet-page">
-  <div class="wallet-header">
-    <h2>Sua carteira digital</h2>
-    <p>Veja abaixo o saldo e o status atual da sua carteira.</p>
-  </div>
+<div class="wallet-page-wrapper">
+  <div class="wallet-page">
 
-  <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
-  <div *ngIf="!isLoading && errorMessage" class="alert alert-error">{{ errorMessage }}</div>
+    <header class="wallet-header">
+      <h2>Sua carteira digital</h2>
+      <p>Acompanhe seu saldo e atividades com a transparência que você merece.</p>
+    </header>
 
-  <section class="wallet-card">
-    <div *ngIf="isLoading" class="wallet-state wallet-state--loading">
-      <h3>Carregando carteira...</h3>
-      <p>Aguarde enquanto buscamos as informações da carteira.</p>
-    </div>
+    <div class="alert alert-success" *ngIf="successMessage">{{ successMessage }}</div>
+    <div class="alert alert-error" *ngIf="!isLoading && errorMessage">{{ errorMessage }}</div>
 
-    <div *ngIf="!isLoading && !wallet && errorMessage" class="wallet-state wallet-state--error">
-      <h3>Não foi possível carregar a carteira</h3>
-      <p>{{ errorMessage }}</p>
-    </div>
+    <div class="wallet-layout-grid">
+      <main class="wallet-main-content">
 
-    <div *ngIf="!isLoading && wallet" class="wallet-details">
-      <div class="wallet-hero">
-        <div>
-          <p class="wallet-label">Status da carteira</p>
-          <h3>{{ wallet.walletStatus }}</h3>
+        <section class="wallet-card-section">
+          <div *ngIf="isLoading" class="wallet-state wallet-state--loading">
+            Carregando sua carteira...
+          </div>
+          <div *ngIf="!isLoading && !wallet && errorMessage" class="wallet-state wallet-state--error">
+            Não foi possível buscar as informações.
+          </div>
+
+          <div *ngIf="!isLoading && wallet" class="wallet-balance-card">
+            <div class="card-hero">
+              <div class="status-group">
+                <span class="wallet-label">STATUS DA CARTEIRA</span>
+                <div class="status-badge" [ngClass]="wallet.walletStatus.toLowerCase()">
+                  <span class="dot"></span> {{ wallet.walletStatus }}
+                </div>
+              </div>
+
+              <div class="balance-group">
+                <span class="wallet-label">SALDO DISPONÍVEL</span>
+                <strong>{{ wallet.balance | currency:'BRL' }}</strong>
+              </div>
+            </div>
+
+            <div class="card-footer">
+              <div class="update-info">
+                <span class="wallet-label">Última atualização</span>
+                <span>{{ wallet.updatedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+              <div class="card-actions">
+                <button class="btn btn-pill btn-primary" (click)="openAddFunds()">
+                  + Adicionar saldo
+                </button>
+                <a class="btn btn-pill btn-outline" routerLink="/transfer">Transferir</a>
+                <a class="btn btn-pill btn-outline" routerLink="/cofrinhos">Poupar</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="activities-section">
+          <div class="section-header">
+            <h3>Atividades recentes</h3>
+            <a href="#" class="link-btn">Ver tudo</a>
+          </div>
+
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="icon-circle in">↓</div>
+              <div class="activity-details">
+                <p class="activity-title">Depósito recebido</p>
+                <p class="activity-meta">Hoje, 10:30</p>
+              </div>
+              <span class="activity-amount positive">+ R$ 150,00</span>
+            </div>
+
+            <div class="activity-empty" *ngIf="false">
+              Sem movimentações recentes.
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <aside class="wallet-sidebar">
+        <div class="card-widget">
+          <h4>Meu Cartão</h4>
+          <div class="card-preview">
+            <p class="card-brand">AuraPay</p>
+            <p class="card-number">**** **** **** 4589</p>
+          </div>
         </div>
 
-        <div class="wallet-balance">
-          <p class="wallet-label">Saldo disponível</p>
-          <strong>{{ wallet.balance | currency:'BRL':'symbol':'1.2-2' }}</strong>
+        <div class="goal-widget">
+          <h4>Cofrinho</h4>
+          <div class="goal-content">
+            <div class="goal-icon">💰</div>
+            <p>Você poupou <strong>R$ 1.200</strong> este mês. Continue assim!</p>
+          </div>
         </div>
-      </div>
-
-      <div class="info-card">
-        <p class="wallet-label">Última atualização</p>
-        <span>{{ wallet.updatedAt | date:'dd/MM/yyyy HH:mm' }}</span>
-      </div>
-
-      <div class="wallet-actions">
-        <button class="btn btn-primary" (click)="openAddFunds()">Adicionar saldo</button>
-      </div>
+      </aside>
     </div>
-  </section>
-
-  <!-- Modal: Adicionar saldo -->
-  <div class="modal-backdrop" *ngIf="isAddFundsOpen" (click)="closeAddFunds()"></div>
-  <div class="modal" *ngIf="isAddFundsOpen" role="dialog" aria-modal="true">
-    <div class="modal-header">
-      <h3>Adicionar saldo</h3>
-      <button class="icon-btn" (click)="closeAddFunds()">×</button>
-    </div>
-
-    <form class="modal-body" [formGroup]="addFundsForm" (ngSubmit)="addFunds()">
-      <label>
-        Valor*
-        <input type="number" inputmode="decimal" step="0.01" min="0" formControlName="amount" placeholder="Ex: 50.00" />
-      </label>
-
-      <div class="modal-actions">
-        <button type="button" class="btn btn-ghost" (click)="closeAddFunds()" [disabled]="isSubmittingAddFunds">Cancelar</button>
-        <button type="submit" class="btn btn-primary" [disabled]="isSubmittingAddFunds">
-          {{ isSubmittingAddFunds ? 'Adicionando...' : 'Adicionar' }}
-        </button>
-      </div>
-    </form>
   </div>
+
+</div>
+
+<!-- Modal: Adicionar saldo -->
+<div class="modal-backdrop" *ngIf="isAddFundsOpen" (click)="closeAddFunds()"></div>
+<div class="modal" *ngIf="isAddFundsOpen" role="dialog" aria-modal="true" aria-label="Adicionar saldo" (click)="$event.stopPropagation()">
+  <div class="modal-header">
+    <h3>Adicionar saldo</h3>
+    <button class="icon-btn" type="button" (click)="closeAddFunds()">×</button>
+  </div>
+
+  <form class="modal-body" [formGroup]="addFundsForm" (ngSubmit)="addFunds()">
+    <label>
+      Valor (R$)
+      <input type="number" min="0.01" step="0.01" formControlName="amount" placeholder="Ex.: 50" />
+    </label>
+
+    <div *ngIf="errorMessage" class="alert alert-error">{{ errorMessage }}</div>
+    <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" type="button" (click)="closeAddFunds()">Cancelar</button>
+      <button class="btn btn-primary" type="submit" [disabled]="isSubmittingAddFunds">
+        <span *ngIf="!isSubmittingAddFunds">Confirmar</span>
+        <span *ngIf="isSubmittingAddFunds">Processando…</span>
+      </button>
+    </div>
+  </form>
 </div>

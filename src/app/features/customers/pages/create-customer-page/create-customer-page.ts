@@ -14,6 +14,13 @@ export class CreateCustomerPage {
   isSubmitting: boolean = false;
   errorMessage: string = '';
 
+  activeTab: 'cadastro' | 'login' = 'cadastro';
+
+  loginEmail: string = '';
+  loginDoc: string = '';
+  isSubmittingLogin: boolean = false;
+  loginError: string = '';
+
   form!: ReturnType<FormBuilder['group']>;
 
   constructor(
@@ -66,5 +73,33 @@ export class CreateCustomerPage {
           'Não foi possível criar a conta.';
       }
     });
+  }
+
+  submitLogin(): void {
+    if (!this.loginEmail?.trim() || !this.loginDoc?.trim()) {
+      this.loginError = 'Preencha e-mail e CPF para entrar.';
+      return;
+    }
+
+    this.isSubmittingLogin = true;
+    this.loginError = '';
+
+    const storedCustomerId = sessionStorage.getItem('customerId');
+
+    if (!storedCustomerId) {
+      this.isSubmittingLogin = false;
+      this.loginError = 'Nenhuma conta encontrada neste navegador. Faça o cadastro primeiro.';
+      return;
+    }
+
+    const customerId = Number(storedCustomerId);
+    if (!Number.isFinite(customerId)) {
+      this.isSubmittingLogin = false;
+      this.loginError = 'Sessão inválida. Faça o cadastro novamente.';
+      return;
+    }
+
+    this.isSubmittingLogin = false;
+    this.router.navigate(['/wallet'], { queryParams: { customerId } });
   }
 }

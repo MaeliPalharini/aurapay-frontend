@@ -15,7 +15,7 @@ export class App {
   constructor() {
     this.refreshCustomerRegistration();
 
-    // Mantém sincronizado entre abas/janelas.
+
     window.addEventListener('storage', (e: StorageEvent) => {
       if (e.key === 'customerId') {
         this.refreshCustomerRegistration();
