@@ -6,7 +6,6 @@
         <div>
           <h2>Cofrinho</h2>
           <p>Reserve dinheiro para render e ficar protegido de gastos impulsivos.</p>
-          <small *ngIf="customerId">Cliente: {{ customerId }}</small>
           <div class="wallet-info" *ngIf="customerId">
             <small *ngIf="isLoadingWallet">Carteira: carregando...</small>
             <small *ngIf="!isLoadingWallet && walletBalance !== null && walletBalance !== undefined">
@@ -151,47 +150,5 @@
         <button type="submit" class="btn btn-primary">Resgatar</button>
       </div>
     </form>
-  </div>
-
-  <!-- Modal: Rendimentos -->
-  <div class="modal-backdrop" *ngIf="isYieldOpen" (click)="closeModals()"></div>
-  <div class="modal modal--lg" *ngIf="isYieldOpen" role="dialog" aria-modal="true">
-    <div class="modal-header">
-      <h3>Rendimentos</h3>
-      <button class="icon-btn" (click)="closeModals()">×</button>
-    </div>
-
-    <div class="modal-body">
-      <p class="muted" *ngIf="selectedPiggyBank">Cofrinho: <strong>{{ selectedPiggyBank.name }}</strong></p>
-
-      <div *ngIf="isLoadingYield" class="state">Carregando rendimentos...</div>
-
-      <div *ngIf="!isLoadingYield && yieldHistory.length === 0" class="state">
-        Sem rendimentos para exibir.
-      </div>
-
-      <div *ngIf="!isLoadingYield && yieldHistory.length > 0" class="table-wrap">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Rendimento</th>
-              <th>Criado em</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let y of yieldHistory">
-              <td>{{ y.yieldDate | date:'dd/MM/yyyy' }}</td>
-              <td>{{ y.yieldAmount | currency:'BRL':'symbol':'1.2-2' }}</td>
-              <td>{{ y.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="modal-actions">
-        <button type="button" class="btn btn-ghost" (click)="closeModals()">Fechar</button>
-      </div>
-    </div>
   </div>
 </div>

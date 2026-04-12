@@ -83,64 +83,171 @@
   gap: 22px;
 }
 
+/* Hero (status + saldo) */
 .wallet-hero {
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
-  gap: 20px;
-  padding: 24px;
-  border-radius: 24px;
-  background: linear-gradient(145deg, #2f63f2 0%, #2047b7 55%, #17398f 100%);
-  color: #fff;
-  box-shadow: 0 16px 40px rgba(31, 76, 204, 0.28);
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.wallet-label {
+  margin: 0;
+  color: #607089;
+  font-weight: 800;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
 .wallet-balance {
   text-align: right;
 }
 
-.wallet-label {
-  margin: 0 0 8px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.78);
-}
-
-.wallet-hero h3 {
-  margin: 0;
-  font-size: 2rem;
+.wallet-balance strong {
+  display: block;
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #0f172a;
   letter-spacing: -0.03em;
 }
 
-.wallet-balance strong {
-  font-size: 2rem;
-  line-height: 1;
-}
-
-.wallet-info-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-}
-
+/* Card simples para infos */
 .info-card {
-  padding: 20px;
-  border-radius: 20px;
-  background: #f7f9fd;
-  border: 1px solid #e2e8f3;
-}
-
-.info-card .wallet-label {
-  color: #607089;
-  margin-bottom: 10px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(241, 245, 249, 0.7);
+  border: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 .info-card span {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #142033;
+  color: #0f172a;
+  font-weight: 800;
+}
+
+/* (mantido) */
+.wallet-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Grid (caso você reutilize mais infos no futuro) */
+.wallet-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+/* Alerts/botões/modais (compatível com o padrão usado em cofrinhos) */
+.alert {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid;
+}
+
+.alert-success {
+  background: #eaf8ef;
+  border-color: #bfe8cb;
+  color: #1e6b35;
+}
+
+.alert-error {
+  background: #fff1f1;
+  border-color: #ffd0d0;
+  color: #8a1f1f;
+}
+
+.btn {
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+.btn-primary {
+  background: #111827;
+  color: #fff;
+}
+
+.btn-ghost {
+  background: #f1f5f9;
+  border-color: rgba(15, 23, 42, 0.10);
+  color: #0f172a;
+}
+
+.btn[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 50;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border-radius: 14px;
+  width: min(520px, calc(100vw - 24px));
+  border: 1px solid #e7e7e7;
+  z-index: 51;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-body label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.modal-body input {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #dcdcdc;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.icon-btn {
+  border: none;
+  background: transparent;
+  font-size: 22px;
+  cursor: pointer;
+  line-height: 1;
 }
 
 @media (max-width: 768px) {

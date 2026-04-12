@@ -5,7 +5,6 @@ import { PiggyBankApiService } from '../../../../core/api/piggy-bank-api.service
 import { CustomerApiService } from '../../../../core/api/customer-api.service';
 import {
   PiggyBankSummary,
-  PiggyBankYieldItem,
 } from '../../models/piggy-bank.models';
 
 @Component({
@@ -19,17 +18,14 @@ export class PiggyBankPage implements OnInit {
 
   piggyBanks: PiggyBankSummary[] = [];
   selectedPiggyBank: PiggyBankSummary | null = null;
-  yieldHistory: PiggyBankYieldItem[] = [];
 
   isLoadingList = false;
-  isLoadingYield = false;
   errorMessage = '';
   successMessage = '';
 
   isCreateOpen = false;
   isDepositOpen = false;
   isWithdrawOpen = false;
-  isYieldOpen = false;
 
   createForm: ReturnType<FormBuilder['group']>;
   depositForm: ReturnType<FormBuilder['group']>;
@@ -220,7 +216,7 @@ export class PiggyBankPage implements OnInit {
 
     this.piggyBankApi
       .deposit(this.selectedPiggyBank.id, {
-        customerId: String(this.customerId),
+        customerId: this.customerId,
         amount,
       })
       .subscribe({
@@ -278,38 +274,10 @@ export class PiggyBankPage implements OnInit {
       });
   }
 
-  openYield(pb: PiggyBankSummary): void {
-    this.clearMessages();
-    this.selectedPiggyBank = pb;
-    this.isYieldOpen = true;
-    this.loadYield();
-  }
-
-  loadYield(): void {
-    if (!this.selectedPiggyBank) return;
-
-    this.isLoadingYield = true;
-    this.yieldHistory = [];
-
-    this.piggyBankApi.getYieldHistory(this.selectedPiggyBank.id).subscribe({
-      next: (res) => {
-        this.yieldHistory = res?.yields ?? [];
-        this.isLoadingYield = false;
-        this.cdr.detectChanges();
-      },
-      error: (error: any) => {
-        this.errorMessage = error?.error?.message || error?.message || 'Não foi possível carregar os rendimentos.';
-        this.isLoadingYield = false;
-        this.cdr.detectChanges();
-      },
-    });
-  }
-
   closeModals(): void {
     this.isCreateOpen = false;
     this.isDepositOpen = false;
     this.isWithdrawOpen = false;
-    this.isYieldOpen = false;
     this.selectedPiggyBank = null;
   }
 

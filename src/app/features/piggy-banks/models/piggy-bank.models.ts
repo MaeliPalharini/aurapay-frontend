@@ -28,7 +28,7 @@ export interface CreatePiggyBankResponse extends PiggyBankSummary {
 export type PiggyBankTransactionStatus = 'SUCCESS' | 'FAILED';
 
 export interface DepositToPiggyBankRequest {
-  customerId: string;
+  customerId: number;
   amount: number;
 }
 

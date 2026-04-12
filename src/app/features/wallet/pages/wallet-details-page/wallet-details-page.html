@@ -4,13 +4,16 @@
     <p>Veja abaixo o saldo e o status atual da sua carteira.</p>
   </div>
 
+  <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+  <div *ngIf="!isLoading && errorMessage" class="alert alert-error">{{ errorMessage }}</div>
+
   <section class="wallet-card">
     <div *ngIf="isLoading" class="wallet-state wallet-state--loading">
       <h3>Carregando carteira...</h3>
       <p>Aguarde enquanto buscamos as informações da carteira.</p>
     </div>
 
-    <div *ngIf="!isLoading && errorMessage" class="wallet-state wallet-state--error">
+    <div *ngIf="!isLoading && !wallet && errorMessage" class="wallet-state wallet-state--error">
       <h3>Não foi possível carregar a carteira</h3>
       <p>{{ errorMessage }}</p>
     </div>
@@ -33,6 +36,32 @@
         <span>{{ wallet.updatedAt | date:'dd/MM/yyyy HH:mm' }}</span>
       </div>
 
+      <div class="wallet-actions">
+        <button class="btn btn-primary" (click)="openAddFunds()">Adicionar saldo</button>
+      </div>
     </div>
   </section>
+
+  <!-- Modal: Adicionar saldo -->
+  <div class="modal-backdrop" *ngIf="isAddFundsOpen" (click)="closeAddFunds()"></div>
+  <div class="modal" *ngIf="isAddFundsOpen" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <h3>Adicionar saldo</h3>
+      <button class="icon-btn" (click)="closeAddFunds()">×</button>
+    </div>
+
+    <form class="modal-body" [formGroup]="addFundsForm" (ngSubmit)="addFunds()">
+      <label>
+        Valor*
+        <input type="number" inputmode="decimal" step="0.01" min="0" formControlName="amount" placeholder="Ex: 50.00" />
+      </label>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" (click)="closeAddFunds()" [disabled]="isSubmittingAddFunds">Cancelar</button>
+        <button type="submit" class="btn btn-primary" [disabled]="isSubmittingAddFunds">
+          {{ isSubmittingAddFunds ? 'Adicionando...' : 'Adicionar' }}
+        </button>
+      </div>
+    </form>
+  </div>
 </div>

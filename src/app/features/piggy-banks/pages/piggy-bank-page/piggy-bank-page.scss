@@ -25,14 +25,13 @@
 }
 
 .header-icon {
-  width: 1000px;
-  height: 500px;
+  width: 80px;
+  height: 80px;
   object-fit: contain;
   border-radius: 100px;
   background: rgba(255, 255, 255, 0.75);
   border: 1px solid rgba(15, 23, 42, 0.10);
   box-shadow: 0 12px 26px rgba(15, 23, 42, 0.12);
-  animation: pigyFloat 2.8s ease-in-out infinite;
 }
 
 
@@ -66,7 +65,7 @@
 
 .state {
   padding: 14px;
-  color: #de0d0d;
+  color: #475569;
 }
 
 .table-wrap {

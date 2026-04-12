@@ -65,7 +65,7 @@ export class PiggyBankDetailsPage implements OnInit {
     }
 
     if (!customerIdParam || Number.isNaN(customerId) || customerId <= 0) {
-      this.errorMessage = 'Cliente não informado. Volte para a lista e informe o customerId.';
+      this.errorMessage = 'Não foi possível identificar o usuário. Faça o cadastro/login novamente.';
       this.cdr.detectChanges();
       return;
     }
@@ -191,7 +191,7 @@ export class PiggyBankDetailsPage implements OnInit {
       return;
     }
 
-    this.piggyBankApi.deposit(this.piggyBankId, { customerId: String(this.customerId), amount }).subscribe({
+    this.piggyBankApi.deposit(this.piggyBankId, { customerId: this.customerId, amount }).subscribe({
       next: (res) => {
         this.successMessage = 'Depósito realizado com sucesso.';
         this.isDepositOpen = false;

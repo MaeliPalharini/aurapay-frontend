@@ -20,4 +20,8 @@ export class CustomerApiService {
   getWalletByCustomerId(customerId: number): Observable<GetWalletResponse> {
     return this.http.get<GetWalletResponse>(`${this.baseUrl}/customers/${customerId}/wallet`);
   }
+
+  depositToWallet(customerId: number, amount: number): Observable<GetWalletResponse> {
+    return this.http.post<GetWalletResponse>(`${this.baseUrl}/customers/${customerId}/wallet/deposit`, { amount });
+  }
 }
