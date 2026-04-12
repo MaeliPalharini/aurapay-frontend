@@ -4,7 +4,15 @@
     <h2>Abra sua carteira digital</h2>
     <p>Cadastre-se para acessar sua conta, acompanhar seu saldo e movimentar seus valores com praticidade.</p>
   </div>
-
+  <section class="illustration-panel">
+    <div class="illustration-frame">
+      <img
+        src="images/cadastro.png"
+        alt="Pessoa feliz usando carteira digital"
+        class="illustration-image"
+      />
+    </div>
+  </section>
   <div class="customer-layout">
     <section class="wallet-preview-card">
       <div class="wallet-card">
@@ -26,7 +34,6 @@
             <strong>Pronta para ativação</strong>
           </div>
 
-          <div class="wallet-brand-mini">AURA PAY</div>
         </div>
       </div>
     </section>
@@ -57,7 +64,6 @@
           {{ isSubmitting ? 'Criando conta...' : 'Criar minha conta' }}
         </button>
 
-        <p class="success-message" *ngIf="successMessage">{{ successMessage }}</p>
         <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
       </form>
     </section>

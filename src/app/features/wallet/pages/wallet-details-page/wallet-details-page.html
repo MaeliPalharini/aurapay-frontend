@@ -1,23 +1,38 @@
-<div class="wallet-details-page">
-  <div class="page-header">
-    <h2>Consultar carteira</h2>
-    <p>Veja os dados da carteira vinculada ao cliente.</p>
+<div class="wallet-page">
+  <div class="wallet-header">
+    <h2>Sua carteira digital</h2>
+    <p>Veja abaixo o saldo e o status atual da sua carteira.</p>
   </div>
 
-  <div *ngIf="isLoading">
-    Carregando carteira...
-  </div>
+  <section class="wallet-card">
+    <div *ngIf="isLoading" class="wallet-state wallet-state--loading">
+      <h3>Carregando carteira...</h3>
+      <p>Aguarde enquanto buscamos as informações da carteira.</p>
+    </div>
 
-  <div *ngIf="errorMessage && !isLoading" class="error-message">
-    {{ errorMessage }}
-  </div>
+    <div *ngIf="!isLoading && errorMessage" class="wallet-state wallet-state--error">
+      <h3>Não foi possível carregar a carteira</h3>
+      <p>{{ errorMessage }}</p>
+    </div>
 
-  <div *ngIf="wallet && !isLoading" class="wallet-result-card">
-    <h3>Carteira criada com sucesso</h3>
+    <div *ngIf="!isLoading && wallet" class="wallet-details">
+      <div class="wallet-hero">
+        <div>
+          <p class="wallet-label">Status da carteira</p>
+          <h3>{{ wallet.walletStatus }}</h3>
+        </div>
 
-    <p><strong>ID da carteira:</strong> {{ wallet.walletId }}</p>
-    <p><strong>ID do cliente:</strong> {{ wallet.customerId }}</p>
-    <p><strong>Saldo:</strong> {{ wallet.balance }}</p>
-    <p><strong>Status:</strong> {{ wallet.walletStatus }}</p>
-  </div>
+        <div class="wallet-balance">
+          <p class="wallet-label">Saldo disponível</p>
+          <strong>{{ wallet.balance | currency:'BRL':'symbol':'1.2-2' }}</strong>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <p class="wallet-label">Última atualização</p>
+        <span>{{ wallet.updatedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+
+    </div>
+  </section>
 </div>

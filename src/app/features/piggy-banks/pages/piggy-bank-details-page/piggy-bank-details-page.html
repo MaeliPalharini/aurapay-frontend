@@ -1,0 +1,178 @@
+<div class="piggy-bank-details">
+  <header class="details-header card">
+    <div class="details-header__left">
+      <button class="btn btn-ghost" type="button" (click)="goBack()" title="Voltar">
+        <span class="icon" aria-hidden="true">←</span>
+        Voltar
+      </button>
+
+      <div class="title-wrap">
+        <div class="title-row">
+          <img class="hero-icon" src="images/pigy.png" alt="Cofrinho" />
+          <div>
+            <h2 class="title">{{ piggyBank?.name || 'Cofrinho' }}</h2>
+            <p class="subtitle">Organize sua reserva e acompanhe rendimentos.</p>
+          </div>
+        </div>
+
+        <div class="meta" *ngIf="piggyBank">
+          <span class="pill" [class.pill--active]="piggyBank.status==='ACTIVE'" [class.pill--closed]="piggyBank.status==='CLOSED'">
+            {{ piggyBank.status }}
+          </span>
+          <span class="meta-item" *ngIf="piggyBank.createdAt">Criado em: {{ piggyBank.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="details-header__right">
+      <div class="wallet-mini">
+        <div class="wallet-mini__label">Conta Corrente</div>
+        <div class="wallet-mini__value" *ngIf="!isLoadingWallet && walletBalance !== null && walletBalance !== undefined">
+          {{ walletBalance | currency:'BRL':'symbol':'1.2-2' }}
+          <small *ngIf="walletStatus && walletStatus !== 'ACTIVE'">(status: {{ walletStatus }})</small>
+        </div>
+        <div class="wallet-mini__value" *ngIf="isLoadingWallet">Carregando...</div>
+        <div class="wallet-mini__value" *ngIf="!isLoadingWallet && (walletBalance === null || walletBalance === undefined)">Indisponível</div>
+      </div>
+
+      <div class="cta">
+        <button class="btn btn-outline" type="button" (click)="openWithdraw()" [disabled]="!piggyBank" title="Resgatar do cofrinho">
+          <span class="icon" aria-hidden="true">⇄</span>
+          Resgatar
+        </button>
+
+        <button
+          class="btn btn-primary"
+          type="button"
+          (click)="openDeposit()"
+          [disabled]="!canDeposit()"
+          [title]="!canDeposit() ? getDepositDisabledReason() : 'Depositar no cofrinho'"
+        >
+          <span class="icon" aria-hidden="true">＋</span>
+          Depositar
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+  <div *ngIf="errorMessage" class="alert alert-error">{{ errorMessage }}</div>
+
+  <section class="grid">
+    <div class="card kpi">
+      <div class="kpi__label">Saldo no cofrinho</div>
+      <div class="kpi__value" *ngIf="piggyBank">{{ piggyBank.currentAmount | currency:'BRL':'symbol':'1.2-2' }}</div>
+      <div class="kpi__value" *ngIf="!piggyBank">-</div>
+      <div class="kpi__hint">Reserva protegida para render.</div>
+    </div>
+
+    <div class="card kpi">
+      <div class="kpi__label">Meta</div>
+      <div class="kpi__value" *ngIf="piggyBank">
+        {{ (piggyBank.targetAmount ?? null) !== null ? (piggyBank.targetAmount | currency:'BRL':'symbol':'1.2-2') : '-' }}
+      </div>
+      <div class="kpi__hint">Defina uma meta para acompanhar seu progresso.</div>
+    </div>
+
+    <div class="card tips">
+      <div class="tips__title">
+        <span class="icon" aria-hidden="true">💡</span>
+        Dica
+      </div>
+      <p class="tips__text">Depósitos saem automaticamente da sua Conta Corrente. Se não houver saldo, a API bloqueia.</p>
+      <img class="tips__img" src="/images/cadastro.png" alt="Ilustração" />
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="section-header">
+      <h3>
+        <span class="icon" aria-hidden="true">📈</span>
+        Rendimentos
+      </h3>
+      <button class="btn btn-ghost" type="button" (click)="loadYield()">
+        Atualizar
+      </button>
+    </div>
+
+    <div *ngIf="isLoadingYield" class="state">Carregando rendimentos...</div>
+
+    <div *ngIf="!isLoadingYield && yieldHistory.length === 0" class="state">
+      Sem rendimentos para exibir.
+    </div>
+
+    <div *ngIf="!isLoadingYield && yieldHistory.length > 0" class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Rendimento</th>
+            <th>Criado em</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let y of yieldHistory">
+            <td>{{ y.yieldDate | date:'dd/MM/yyyy' }}</td>
+            <td><strong>{{ y.yieldAmount | currency:'BRL':'symbol':'1.2-2' }}</strong></td>
+            <td>{{ y.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Modal: Depositar -->
+  <div class="modal-backdrop" *ngIf="isDepositOpen" (click)="closeModals()"></div>
+  <div class="modal" *ngIf="isDepositOpen" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <h3>
+        <span class="icon" aria-hidden="true">＋</span>
+        Depositar
+      </h3>
+      <button class="icon-btn" (click)="closeModals()">×</button>
+    </div>
+
+    <form class="modal-body" [formGroup]="depositForm" (ngSubmit)="submitDeposit()">
+      <p class="muted" *ngIf="piggyBank">Cofrinho: <strong>{{ piggyBank.name }}</strong></p>
+      <p class="muted" *ngIf="walletBalance !== null && walletBalance !== undefined">
+        Saldo em conta: <strong>{{ walletBalance | currency:'BRL':'symbol':'1.2-2' }}</strong>
+      </p>
+
+      <label>
+        Valor*
+        <input type="number" inputmode="decimal" step="0.01" min="0" formControlName="amount" placeholder="Ex: 10.00" />
+      </label>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" (click)="closeModals()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Depositar</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Modal: Resgatar -->
+  <div class="modal-backdrop" *ngIf="isWithdrawOpen" (click)="closeModals()"></div>
+  <div class="modal" *ngIf="isWithdrawOpen" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <h3>
+        <span class="icon" aria-hidden="true">⇄</span>
+        Resgatar
+      </h3>
+      <button class="icon-btn" (click)="closeModals()">×</button>
+    </div>
+
+    <form class="modal-body" [formGroup]="withdrawForm" (ngSubmit)="submitWithdraw()">
+      <p class="muted" *ngIf="piggyBank">Cofrinho: <strong>{{ piggyBank.name }}</strong></p>
+
+      <label>
+        Valor*
+        <input type="number" inputmode="decimal" step="0.01" min="0" formControlName="amount" placeholder="Ex: 10.00" />
+      </label>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" (click)="closeModals()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Resgatar</button>
+      </div>
+    </form>
+  </div>
+</div>

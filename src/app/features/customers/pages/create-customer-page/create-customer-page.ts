@@ -12,7 +12,6 @@ import { CreateCustomerResponse } from '../../models/create-customer-response.mo
 })
 export class CreateCustomerPage {
   isSubmitting: boolean = false;
-  successMessage: string = '';
   errorMessage: string = '';
 
   form!: ReturnType<FormBuilder['group']>;
@@ -36,7 +35,6 @@ export class CreateCustomerPage {
     }
 
     this.isSubmitting = true;
-    this.successMessage = '';
     this.errorMessage = '';
 
     const payload = {
@@ -45,9 +43,13 @@ export class CreateCustomerPage {
       documentNumber: this.form.value.documentNumber ?? ''
     };
 
+    console.log('Payload enviado:', payload);
+
     this.customerApiService.createCustomer(payload).subscribe({
       next: (response: CreateCustomerResponse): void => {
         this.isSubmitting = false;
+
+        sessionStorage.setItem('customerId', response.customerId.toString());
 
         this.router.navigate(['/wallet'], {
           queryParams: { customerId: response.customerId }
@@ -56,6 +58,7 @@ export class CreateCustomerPage {
       error: (error: any): void => {
         this.isSubmitting = false;
         console.error('Erro ao criar conta:', error);
+        console.error('Body do erro:', error?.error);
 
         this.errorMessage =
           error?.error?.message ||
