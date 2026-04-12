@@ -4,19 +4,24 @@
 
 :host {
   font-family: 'Inter', sans-serif;
-  color: #f8fafc;
+  /* Antes estava muito claro e "sumia" no fundo branco */
+  color: #0f172a;
+  font-size: 16px;
+  line-height: 1.5;
 }
 
 html,
 body {
   margin: 0;
   min-height: 100%;
+  /* Fundo mais vibrante */
   background:
-    radial-gradient(circle at top left, #f7f9ff 0%, #eef3fb 45%, #e8eef8 100%);
-}
-
-body {
-  overflow-x: hidden;
+    radial-gradient(circle at top left, rgba(47, 99, 242, 0.28) 0%, transparent 58%),
+    radial-gradient(circle at 20% 85%, rgba(139, 92, 246, 0.22) 0%, transparent 55%),
+    radial-gradient(circle at bottom right, rgba(244, 188, 94, 0.26) 0%, transparent 62%),
+    linear-gradient(180deg, #f7fbff 0%, #eef2ff 45%, #ebf9ff 100%);
+  color: #0f172a;
+  font-size: 16px;
 }
 
 .app-shell {
@@ -131,10 +136,92 @@ body {
   flex: 1;
   padding: 28px;
   border-radius: 34px;
-  background: rgba(255, 255, 255, 0.38);
-  border: 1px solid rgba(255, 255, 255, 0.62);
-  backdrop-filter: blur(18px);
-  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+  /* Camadas: transparência + grid + noise (sem imagem externa) */
+  background:
+    radial-gradient(circle at 18% 12%, rgba(47, 99, 242, 0.14) 0%, transparent 55%),
+    radial-gradient(circle at 82% 18%, rgba(244, 188, 94, 0.16) 0%, transparent 55%),
+    radial-gradient(circle at 50% 105%, rgba(34, 211, 238, 0.13) 0%, transparent 55%),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.88)),
+    repeating-linear-gradient(0deg, rgba(15, 23, 42, 0.040) 0, rgba(15, 23, 42, 0.040) 1px, transparent 1px, transparent 20px),
+    repeating-linear-gradient(90deg, rgba(15, 23, 42, 0.040) 0, rgba(15, 23, 42, 0.040) 1px, transparent 1px, transparent 20px);
+  border: 1px solid rgba(47, 99, 242, 0.18);
+  box-shadow:
+    0 18px 45px rgba(15, 23, 42, 0.12),
+    0 0 0 1px rgba(244, 188, 94, 0.10) inset;
+  position: relative;
+  overflow: hidden;
+  animation: contentFadeIn 220ms ease-out;
+}
+
+.content::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* Textura “noise” via múltiplos radial-gradients */
+  background:
+    radial-gradient(circle at 20% 30%, rgba(15, 23, 42, 0.04) 0 1px, transparent 2px),
+    radial-gradient(circle at 70% 60%, rgba(15, 23, 42, 0.035) 0 1px, transparent 2px),
+    radial-gradient(circle at 40% 80%, rgba(15, 23, 42, 0.03) 0 1px, transparent 2px);
+  opacity: 0.8;
+  mix-blend-mode: multiply;
+}
+
+/* Realce em hover no painel principal */
+.content:hover {
+  box-shadow:
+    0 26px 70px rgba(15, 23, 42, 0.14),
+    0 0 0 1px rgba(47, 99, 242, 0.16) inset,
+    0 0 0 1px rgba(244, 188, 94, 0.10);
+}
+
+@keyframes contentFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Micro-interações globais */
+.content .btn {
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+
+.content .btn:hover {
+  transform: translateY(-1px);
+}
+
+.content .btn:active {
+  transform: translateY(1px);
+}
+
+/* Respeita acessibilidade - reduz movimento */
+@media (prefers-reduced-motion: reduce) {
+  .content {
+    animation: none;
+  }
+
+  .content .btn {
+    transition: none;
+  }
+}
+
+/* Tipografia mínima para páginas internas */
+.content h1,
+.content h2,
+.content h3 {
+  color: #0f172a;
+}
+
+.content p,
+.content small,
+.content label,
+.content td,
+.content th {
+  color: #111827;
+  font-size: 1rem;
+}
+
+.content small {
+  font-size: 0.95rem;
 }
 
 .success-message {
@@ -167,5 +254,8 @@ body {
   .sidebar {
     width: 100%;
   }
-}
 
+  .content {
+    padding: 18px;
+  }
+}
