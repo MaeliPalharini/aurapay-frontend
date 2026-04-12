@@ -35,29 +35,17 @@ export class WalletDetailsPage implements OnInit {
   }
 
   ngOnInit(): void {
-    let customerIdParam = this.route.snapshot.queryParamMap.get('customerId');
-
-    if (!customerIdParam) {
-      customerIdParam = sessionStorage.getItem('customerId');
-    }
-
-    if (!customerIdParam) {
-      this.errorMessage = 'Cliente não informado para consulta da carteira.';
-      this.isLoading = false;
+    // Sempre busca o customerId do localStorage
+    const customerIdStr = localStorage.getItem('customerId');
+    if (!customerIdStr) {
+      this.errorMessage = 'Usuário não autenticado. Faça login.';
       return;
     }
-
-    const customerId = Number(customerIdParam);
-
-    if (Number.isNaN(customerId) || customerId <= 0) {
+    this.customerId = Number(customerIdStr);
+    if (Number.isNaN(this.customerId) || this.customerId <= 0) {
       this.errorMessage = 'ID do cliente inválido.';
-      this.isLoading = false;
       return;
     }
-
-    this.customerId = customerId;
-    sessionStorage.setItem('customerId', String(customerId));
-
     this.loadWallet();
   }
 

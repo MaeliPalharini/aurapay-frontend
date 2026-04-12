@@ -24,4 +24,11 @@ export class CustomerApiService {
   depositToWallet(customerId: number, amount: number): Observable<GetWalletResponse> {
     return this.http.post<GetWalletResponse>(`${this.baseUrl}/customers/${customerId}/wallet/deposit`, { amount });
   }
+
+  login(email: string, documentNumber?: string): Observable<{ customerId: number, fullName: string, email: string }> {
+    return this.http.post<{ customerId: number, fullName: string, email: string }>(
+      `${this.baseUrl}/customers/login`,
+      { email, documentNumber }
+    );
+  }
 }

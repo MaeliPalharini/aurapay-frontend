@@ -55,9 +55,13 @@ export class CreateCustomerPage {
     this.customerApiService.createCustomer(payload).subscribe({
       next: (response: CreateCustomerResponse): void => {
         this.isSubmitting = false;
-
-        sessionStorage.setItem('customerId', response.customerId.toString());
-
+        // Salva dados do usuário no localStorage
+        localStorage.setItem('customerId', response.customerId.toString());
+        localStorage.setItem('user', JSON.stringify({
+          customerId: response.customerId,
+          fullName: payload.fullName,
+          email: payload.email
+        }));
         this.router.navigate(['/wallet'], {
           queryParams: { customerId: response.customerId }
         });
@@ -80,26 +84,22 @@ export class CreateCustomerPage {
       this.loginError = 'Preencha e-mail e CPF para entrar.';
       return;
     }
-
     this.isSubmittingLogin = true;
     this.loginError = '';
-
-    const storedCustomerId = sessionStorage.getItem('customerId');
-
-    if (!storedCustomerId) {
-      this.isSubmittingLogin = false;
-      this.loginError = 'Nenhuma conta encontrada neste navegador. Faça o cadastro primeiro.';
-      return;
-    }
-
-    const customerId = Number(storedCustomerId);
-    if (!Number.isFinite(customerId)) {
-      this.isSubmittingLogin = false;
-      this.loginError = 'Sessão inválida. Faça o cadastro novamente.';
-      return;
-    }
-
-    this.isSubmittingLogin = false;
-    this.router.navigate(['/wallet'], { queryParams: { customerId } });
+    this.customerApiService.login(this.loginEmail, this.loginDoc).subscribe({
+      next: (response: { customerId: number, fullName: string, email: string }) => {
+        this.isSubmittingLogin = false;
+        // Salva dados do usuário logado no localStorage
+        localStorage.setItem('customerId', response.customerId.toString());
+        localStorage.setItem('user', JSON.stringify(response));
+        this.router.navigate(['/wallet'], {
+          queryParams: { customerId: response.customerId }
+        });
+      },
+      error: (error: any) => {
+        this.isSubmittingLogin = false;
+        this.loginError = error?.error?.message || error?.message || 'Não foi possível fazer login.';
+      }
+    });
   }
 }

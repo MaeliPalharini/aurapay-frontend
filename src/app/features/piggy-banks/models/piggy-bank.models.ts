@@ -9,6 +9,7 @@ export interface PiggyBankSummary {
   currentAmount: number;
   status: PiggyBankStatus;
   createdAt?: string;
+  imageUrl?: string; // <- Adicionado para suportar imagens dos cofrinhos
 }
 
 export interface ListPiggyBanksResponse {
