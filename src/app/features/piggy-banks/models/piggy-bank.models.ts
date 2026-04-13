@@ -2,14 +2,13 @@ export type PiggyBankStatus = 'ACTIVE' | 'CLOSED';
 
 export interface PiggyBankSummary {
   id: number;
-  /** Backend retorna customerId no create; na listagem pode ou não vir. */
   customerId?: number;
   name: string;
   targetAmount?: number | null;
   currentAmount: number;
   status: PiggyBankStatus;
   createdAt?: string;
-  imageUrl?: string; // <- Adicionado para suportar imagens dos cofrinhos
+  imageUrl?: string | null;
 }
 
 export interface ListPiggyBanksResponse {

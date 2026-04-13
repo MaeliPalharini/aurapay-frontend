@@ -4,8 +4,14 @@ import { ActivatedRoute } from '@angular/router';
 import { PiggyBankApiService } from '../../../../core/api/piggy-bank-api.service';
 import { CustomerApiService } from '../../../../core/api/customer-api.service';
 import {
+  CreatePiggyBankResponse,
   PiggyBankSummary,
 } from '../../models/piggy-bank.models';
+
+type PiggyPreset = {
+  label: string;
+  image: string;
+};
 
 @Component({
   selector: 'app-piggy-bank-page',
@@ -20,22 +26,33 @@ export class PiggyBankPage implements OnInit {
   selectedPiggyBank: PiggyBankSummary | null = null;
 
   isLoadingList = false;
+  isLoadingWallet = false;
+
   errorMessage = '';
   successMessage = '';
 
   isCreateOpen = false;
   isDepositOpen = false;
   isWithdrawOpen = false;
+  isDeleteOpen = false;
+
+  walletBalance: number | null = null;
+  walletStatus: string | null = null;
+
+  selectedPresetImage: string | null = null;
+
+  private readonly defaultPiggyImage = '/images/piggy.png';
+
+  readonly presetOptions: ReadonlyArray<PiggyPreset> = [
+    { label: 'Viagem', image: '/images/Viagem.png' },
+    { label: 'Carro', image: '/images/Carro.png' },
+    { label: 'Imóvel', image: '/images/Imovel.png' },
+    { label: 'Lazer', image: '/images/Lazer.png' },
+  ];
 
   createForm: ReturnType<FormBuilder['group']>;
   depositForm: ReturnType<FormBuilder['group']>;
   withdrawForm: ReturnType<FormBuilder['group']>;
-
-  selectedPresetImage: string | null = null;
-
-  walletBalance: number | null = null;
-  walletStatus: string | null = null;
-  isLoadingWallet = false;
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -59,34 +76,37 @@ export class PiggyBankPage implements OnInit {
   }
 
   ngOnInit(): void {
-    // Sempre busca o customerId do localStorage
-    const customerIdStr = localStorage.getItem('customerId');
-    if (!customerIdStr) {
+    const customerId = this.getCustomerId();
+
+    if (!customerId) {
       this.errorMessage = 'Usuário não autenticado. Faça login.';
       return;
     }
-    this.customerId = Number(customerIdStr);
-    if (Number.isNaN(this.customerId) || this.customerId <= 0) {
-      this.errorMessage = 'ID do cliente inválido.';
-      return;
-    }
+
+    this.customerId = customerId;
+    this.persistCustomerId(customerId);
+
     this.loadWallet();
     this.loadPiggyBanks();
+  }
+
+  trackByPiggyBankId(_: number, pb: PiggyBankSummary): number {
+    return pb.id;
   }
 
   loadWallet(): void {
     if (!this.customerId) return;
 
     this.isLoadingWallet = true;
+
     this.customerApi.getWalletByCustomerId(this.customerId).subscribe({
       next: (res) => {
-        this.walletBalance = typeof res?.balance === 'number' ? res.balance : Number(res?.balance);
-        this.walletStatus = (res?.walletStatus as any) ?? null;
+        this.walletBalance = this.toNumber(res?.balance, 0);
+        this.walletStatus = (res?.walletStatus as string | null) ?? null;
         this.isLoadingWallet = false;
         this.cdr.detectChanges();
       },
       error: () => {
-        // falha em carregar carteira não deve bloquear a tela; backend validará na transação
         this.walletBalance = null;
         this.walletStatus = null;
         this.isLoadingWallet = false;
@@ -97,85 +117,35 @@ export class PiggyBankPage implements OnInit {
 
   loadPiggyBanks(): void {
     if (!this.customerId) return;
+
     this.isLoadingList = true;
+
     this.piggyBankApi.listPiggyBanks(this.customerId).subscribe({
-      next: (res: { piggyBanks: any[] }) => {
-        this.piggyBanks = (res.piggyBanks || []).map((pb) => ({
-          ...pb,
-          image: pb.imageUrl || null
-        }));
+      next: (res) => {
+        this.piggyBanks = (res?.piggyBanks ?? []).map((pb) => this.normalizePiggyBank(pb));
       },
       error: (err: any) => {
         this.errorMessage = err?.error?.message || 'Erro ao carregar cofrinhos.';
       },
       complete: () => {
         this.isLoadingList = false;
-      }
+        this.cdr.detectChanges();
+      },
     });
   }
 
   openCreate(): void {
     this.clearMessages();
+    this.selectedPresetImage = null;
     this.isCreateOpen = true;
     this.createForm.reset({ name: '', targetAmount: null });
-  }
-
-  selectPreset(preset: { label: string; image: string }): void {
-    this.createForm.get('name')?.setValue(preset.label);
-    this.selectedPresetImage = preset.image;
-  }
-
-  submitCreate(): void {
-    if (this.createForm.invalid || !this.customerId) return;
-    const { name, targetAmount } = this.createForm.value;
-    // Salva imagem associada ao nome no localStorage
-    if (this.selectedPresetImage && name) {
-      const piggyImages = JSON.parse(localStorage.getItem('piggyImages') || '{}');
-      piggyImages[name] = this.selectedPresetImage;
-      localStorage.setItem('piggyImages', JSON.stringify(piggyImages));
-    }
-    this.isLoadingList = true;
-    this.piggyBankApi.createPiggyBank({
-      customerId: this.customerId,
-      name,
-      targetAmount
-    }).subscribe({
-      next: () => {
-        this.successMessage = 'Cofrinho criado com sucesso!';
-        this.isCreateOpen = false;
-        this.selectedPresetImage = null;
-        this.loadPiggyBanks();
-      },
-      error: (err: any) => {
-        this.errorMessage = err?.error?.message || 'Erro ao criar cofrinho.';
-      },
-      complete: () => {
-        this.isLoadingList = false;
-      }
-    });
-  }
-
-  canDeposit(pb?: PiggyBankSummary | null): boolean {
-    if (pb?.status !== 'ACTIVE') return false;
-    if (this.walletBalance === null || this.walletBalance === undefined) return true;
-    if (this.walletStatus && this.walletStatus !== 'ACTIVE') return false;
-    if (this.walletBalance <= 0) return false;
-    return true;
-  }
-
-  getDepositDisabledReason(pb?: PiggyBankSummary | null): string {
-    if (pb?.status && pb.status !== 'ACTIVE') return 'Cofrinho fechado.';
-    if (this.walletBalance === null || this.walletBalance === undefined) return 'Saldo da carteira indisponível.';
-    if (this.walletStatus && this.walletStatus !== 'ACTIVE') return `Carteira indisponível (status: ${this.walletStatus}).`;
-    if (this.walletBalance <= 0) return 'Saldo insuficiente na carteira.';
-    return '';
   }
 
   openDeposit(pb: PiggyBankSummary): void {
     this.clearMessages();
 
     if (!this.canDeposit(pb)) {
-      this.errorMessage = this.getDepositDisabledReason(pb) || 'Não é possível depositar.';
+      this.errorMessage = this.getDepositDisabledReason(pb) || 'Não é possível reservar.';
       this.cdr.detectChanges();
       return;
     }
@@ -185,20 +155,96 @@ export class PiggyBankPage implements OnInit {
     this.depositForm.reset({ amount: null });
   }
 
+  openWithdraw(pb: PiggyBankSummary): void {
+    this.clearMessages();
+    this.selectedPiggyBank = pb;
+    this.isWithdrawOpen = true;
+    this.withdrawForm.reset({ amount: null });
+  }
+
+  openDelete(pb: PiggyBankSummary): void {
+    this.clearMessages();
+    this.selectedPiggyBank = pb;
+    this.isDeleteOpen = true;
+  }
+
+  closeModals(preserveMessages = false): void {
+    this.isCreateOpen = false;
+    this.isDepositOpen = false;
+    this.isWithdrawOpen = false;
+    this.isDeleteOpen = false;
+    this.selectedPiggyBank = null;
+    this.selectedPresetImage = null;
+
+    this.createForm.reset({ name: '', targetAmount: null });
+    this.depositForm.reset({ amount: null });
+    this.withdrawForm.reset({ amount: null });
+
+    if (!preserveMessages) {
+      this.clearMessages();
+    }
+  }
+
+  selectPreset(preset: { label: string; image: string }): void {
+    this.createForm.get('name')?.setValue(preset.label);
+    this.selectedPresetImage = preset.image;
+  }
+
+  submitCreate(): void {
+    if (this.createForm.invalid || !this.customerId) {
+      this.createForm.markAllAsTouched();
+      return;
+    }
+
+    this.clearMessages();
+
+    const rawName = this.createForm.value.name;
+    const rawTargetAmount = this.createForm.value.targetAmount;
+
+    const name = String(rawName ?? '').trim();
+    const targetAmount =
+      rawTargetAmount === null || rawTargetAmount === undefined || rawTargetAmount === ''
+        ? null
+        : Number(rawTargetAmount);
+
+    this.isLoadingList = true;
+
+    this.piggyBankApi
+      .createPiggyBank({
+        customerId: this.customerId,
+        name,
+        targetAmount,
+      })
+      .subscribe({
+        next: (created: CreatePiggyBankResponse) => {
+          this.persistSelectedImage(created);
+          this.closeModals(true);
+          this.successMessage = 'Cofrinho criado com sucesso!';
+          this.loadPiggyBanks();
+        },
+        error: (err: any) => {
+          this.errorMessage = err?.error?.message || 'Erro ao criar cofrinho.';
+          this.isLoadingList = false;
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
   submitDeposit(): void {
     if (!this.customerId || !this.selectedPiggyBank) return;
+
     this.clearMessages();
 
     if (this.depositForm.invalid) {
-      this.errorMessage = 'Informe um valor válido para depósito.';
+      this.depositForm.markAllAsTouched();
+      this.errorMessage = 'Informe um valor válido para reserva.';
       return;
     }
 
     const amount = Number(this.depositForm.value.amount);
 
-    // validação visual (best-effort); backend ainda é a fonte de verdade
     if (this.walletBalance !== null && this.walletBalance !== undefined && amount > this.walletBalance) {
-      this.errorMessage = `Saldo insuficiente na carteira. Saldo atual: ${this.walletBalance.toFixed(2)}`;
+      this.errorMessage = `Saldo insuficiente na conta. Saldo atual: ${this.walletBalance.toFixed(2)}`;
       return;
     }
 
@@ -209,32 +255,27 @@ export class PiggyBankPage implements OnInit {
       })
       .subscribe({
         next: () => {
-          this.successMessage = 'Depósito realizado com sucesso.';
-          this.isDepositOpen = false;
+          this.closeModals(true);
+          this.successMessage = 'Valor reservado com sucesso!';
           this.loadWallet();
           this.loadPiggyBanks();
-          this.cdr.detectChanges();
         },
         error: (error: any) => {
-          this.errorMessage = error?.error?.message || error?.message || 'Não foi possível depositar no cofrinho.';
+          this.errorMessage =
+            error?.error?.message || error?.message || 'Não foi possível reservar no cofrinho.';
           this.loadWallet();
           this.cdr.detectChanges();
         },
       });
   }
 
-  openWithdraw(pb: PiggyBankSummary): void {
-    this.clearMessages();
-    this.selectedPiggyBank = pb;
-    this.isWithdrawOpen = true;
-    this.withdrawForm.reset({ amount: null });
-  }
-
   submitWithdraw(): void {
     if (!this.customerId || !this.selectedPiggyBank) return;
+
     this.clearMessages();
 
     if (this.withdrawForm.invalid) {
+      this.withdrawForm.markAllAsTouched();
       this.errorMessage = 'Informe um valor válido para resgate.';
       return;
     }
@@ -248,25 +289,211 @@ export class PiggyBankPage implements OnInit {
       })
       .subscribe({
         next: () => {
-          this.successMessage = 'Resgate realizado com sucesso.';
-          this.isWithdrawOpen = false;
+          this.closeModals(true);
+          this.successMessage = 'Resgate realizado com sucesso!';
           this.loadWallet();
           this.loadPiggyBanks();
-          this.cdr.detectChanges();
         },
         error: (error: any) => {
-          this.errorMessage = error?.error?.message || error?.message || 'Não foi possível resgatar do cofrinho.';
+          this.errorMessage =
+            error?.error?.message || error?.message || 'Não foi possível resgatar do cofrinho.';
           this.loadWallet();
           this.cdr.detectChanges();
         },
       });
   }
 
-  closeModals(): void {
-    this.isCreateOpen = false;
-    this.isDepositOpen = false;
-    this.isWithdrawOpen = false;
-    this.selectedPiggyBank = null;
+  confirmDelete(): void {
+    if (!this.customerId || !this.selectedPiggyBank?.id) return;
+
+    this.clearMessages();
+    this.isLoadingList = true;
+
+    this.piggyBankApi.deletePiggyBank(this.customerId, this.selectedPiggyBank.id).subscribe({
+      next: () => {
+        this.closeModals(true);
+        this.successMessage = 'Cofrinho excluído com sucesso!';
+        this.loadWallet();
+        this.loadPiggyBanks();
+      },
+      error: (err: any) => {
+        this.errorMessage = err?.error?.message || 'Erro ao excluir cofrinho.';
+        this.isLoadingList = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  canDeposit(pb?: PiggyBankSummary | null): boolean {
+    if (pb?.status !== 'ACTIVE') return false;
+    if (this.walletBalance === null || this.walletBalance === undefined) return true;
+    if (this.walletStatus && this.walletStatus !== 'ACTIVE') return false;
+    if (this.walletBalance <= 0) return false;
+    return true;
+  }
+
+  getDepositDisabledReason(pb?: PiggyBankSummary | null): string {
+    if (pb?.status && pb.status !== 'ACTIVE') return 'Cofrinho fechado.';
+    if (this.walletBalance === null || this.walletBalance === undefined) return 'Saldo da conta indisponível.';
+    if (this.walletStatus && this.walletStatus !== 'ACTIVE') {
+      return `Conta indisponível (status: ${this.walletStatus}).`;
+    }
+    if (this.walletBalance <= 0) return 'Saldo insuficiente na conta.';
+    return '';
+  }
+
+  hasTarget(pb: PiggyBankSummary): boolean {
+    return pb.targetAmount !== null && pb.targetAmount !== undefined && Number(pb.targetAmount) > 0;
+  }
+
+  getProgressPercentage(pb: PiggyBankSummary): number {
+    if (!this.hasTarget(pb)) return 0;
+
+    const currentAmount = this.toNumber(pb.currentAmount, 0);
+    const targetAmount = this.toNumber(pb.targetAmount, 0);
+
+    if (targetAmount <= 0) return 0;
+
+    return Math.min((currentAmount / targetAmount) * 100, 100);
+  }
+
+  resolvePiggyBankImage(pb: PiggyBankSummary): string {
+    const savedImage = this.getSavedImage(pb);
+    if (savedImage) return savedImage;
+
+    const backendImage = this.normalizeImagePath(pb.imageUrl);
+    if (backendImage) return backendImage;
+
+    const presetImage = this.findPresetImageByName(pb.name);
+    if (presetImage) return presetImage;
+
+    return this.defaultPiggyImage;
+  }
+
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement | null;
+    if (!img) return;
+
+    if (img.src.includes(this.defaultPiggyImage)) return;
+
+    img.src = this.defaultPiggyImage;
+  }
+
+  private getCustomerId(): number | null {
+    const rawCustomerId =
+      this.route.snapshot.queryParamMap.get('customerId') ??
+      sessionStorage.getItem('customerId') ??
+      localStorage.getItem('customerId');
+
+    if (!rawCustomerId) return null;
+
+    const customerId = Number(rawCustomerId);
+
+    if (Number.isNaN(customerId) || customerId <= 0) return null;
+
+    return customerId;
+  }
+
+  private persistCustomerId(customerId: number): void {
+    sessionStorage.setItem('customerId', String(customerId));
+    localStorage.setItem('customerId', String(customerId));
+  }
+
+  private normalizePiggyBank(pb: PiggyBankSummary): PiggyBankSummary {
+    return {
+      ...pb,
+      currentAmount: this.toNumber(pb.currentAmount, 0),
+      targetAmount:
+        pb.targetAmount === null || pb.targetAmount === undefined
+          ? null
+          : this.toNumber(pb.targetAmount, 0),
+      imageUrl: this.normalizeImagePath(pb.imageUrl),
+    };
+  }
+
+  private persistSelectedImage(created: CreatePiggyBankResponse): void {
+    if (!this.selectedPresetImage) return;
+
+    const storage = this.getPiggyImageStorage();
+    const normalizedName = this.normalizeText(created?.name || this.createForm.value.name || '');
+
+    if (created?.id) {
+      storage[`id:${created.id}`] = this.selectedPresetImage;
+    }
+
+    if (normalizedName) {
+      storage[`name:${normalizedName}`] = this.selectedPresetImage;
+      storage[normalizedName] = this.selectedPresetImage;
+    }
+
+    localStorage.setItem('piggyImages', JSON.stringify(storage));
+  }
+
+  private getSavedImage(pb: PiggyBankSummary): string | null {
+    const storage = this.getPiggyImageStorage();
+
+    const byId = storage[`id:${pb.id}`];
+    const byName = storage[`name:${this.normalizeText(pb.name)}`];
+    const legacyByName = storage[this.normalizeText(pb.name)];
+
+    return this.normalizeImagePath(byId || byName || legacyByName);
+  }
+
+  private getPiggyImageStorage(): Record<string, string> {
+    try {
+      const raw = localStorage.getItem('piggyImages');
+      return raw ? JSON.parse(raw) : {};
+    } catch {
+      return {};
+    }
+  }
+
+  private findPresetImageByName(name: string): string | null {
+    const normalizedName = this.normalizeText(name);
+    const preset = this.presetOptions.find(
+      (item) => this.normalizeText(item.label) === normalizedName
+    );
+
+    return preset?.image ?? null;
+  }
+
+  private normalizeImagePath(path?: string | null): string | null {
+    if (!path) return null;
+
+    const value = String(path).trim();
+    if (!value) return null;
+
+    if (/^https?:\/\//i.test(value) || value.startsWith('/')) {
+      return value;
+    }
+
+    if (value.startsWith('assets/images/')) {
+      return `/${value.replace(/^assets\//, '')}`;
+    }
+
+    if (value.startsWith('images/')) {
+      return `/${value}`;
+    }
+
+    if (/\.(png|jpe?g|webp|svg)$/i.test(value)) {
+      const fileName = value.split('/').pop();
+      return fileName ? `/images/${fileName}` : null;
+    }
+
+    return null;
+  }
+
+  private normalizeText(value: string): string {
+    return String(value)
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim()
+      .toLowerCase();
+  }
+
+  private toNumber(value: unknown, fallback = 0): number {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : fallback;
   }
 
   private clearMessages(): void {

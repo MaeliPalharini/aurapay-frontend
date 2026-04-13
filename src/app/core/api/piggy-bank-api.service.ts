@@ -31,16 +31,35 @@ export class PiggyBankApiService {
     });
   }
 
-  deposit(piggyBankId: number, payload: DepositToPiggyBankRequest): Observable<DepositToPiggyBankResponse> {
-    return this.http.post<DepositToPiggyBankResponse>(`${this.baseUrl}/cofrinhos/${piggyBankId}/deposit`, payload);
+  deposit(
+    piggyBankId: number,
+    payload: DepositToPiggyBankRequest
+  ): Observable<DepositToPiggyBankResponse> {
+    return this.http.post<DepositToPiggyBankResponse>(
+      `${this.baseUrl}/cofrinhos/${piggyBankId}/deposit`,
+      payload
+    );
   }
 
-  withdraw(piggyBankId: number, payload: WithdrawFromPiggyBankRequest): Observable<WithdrawFromPiggyBankResponse> {
-    return this.http.post<WithdrawFromPiggyBankResponse>(`${this.baseUrl}/cofrinhos/${piggyBankId}/withdraw`, payload);
+  withdraw(
+    piggyBankId: number,
+    payload: WithdrawFromPiggyBankRequest
+  ): Observable<WithdrawFromPiggyBankResponse> {
+    return this.http.post<WithdrawFromPiggyBankResponse>(
+      `${this.baseUrl}/cofrinhos/${piggyBankId}/withdraw`,
+      payload
+    );
   }
 
   getYieldHistory(piggyBankId: number): Observable<PiggyBankYieldHistoryResponse> {
-    return this.http.get<PiggyBankYieldHistoryResponse>(`${this.baseUrl}/cofrinhos/${piggyBankId}/yield`);
+    return this.http.get<PiggyBankYieldHistoryResponse>(
+      `${this.baseUrl}/cofrinhos/${piggyBankId}/yield`
+    );
+  }
+
+  deletePiggyBank(customerId: number, piggyBankId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/cofrinhos/${piggyBankId}`, {
+      params: { customerId: String(customerId) },
+    });
   }
 }
-

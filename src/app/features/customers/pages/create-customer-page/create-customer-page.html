@@ -1,109 +1,168 @@
-<!-- Página de Cadastro/Login (CreateCustomerPage) -->
 <div class="auth-shell">
-  <!-- LEFT PANEL — imagem + branding -->
+  <!-- LEFT PANEL -->
   <aside class="auth-panel">
-    <div class="panel-brand">
-      <div class="brand-dot"></div>
-      <span class="brand-name">AuraPay</span>
-    </div>
-
     <div class="panel-image-wrap">
       <img src="/images/cadastro.png" alt="AuraPay" class="panel-image" />
       <div class="panel-image-glow"></div>
+      <div class="panel-overlay"></div>
     </div>
 
-    <div class="panel-copy">
-      <h1>Seu dinheiro,<br><em>do seu jeito.</em></h1>
-      <p>Carteira digital com rendimentos automáticos e cofrinhos para seus objetivos.</p>
-    </div>
+    <div class="panel-content">
+      <div class="panel-top">
+        <div class="panel-brand">
+          <div class="brand-dot"></div>
+          <span class="brand-name">AuraPay</span>
+        </div>
 
-    <div class="panel-badges">
-      <span class="badge">Seguro</span>
-      <span class="badge">Instantâneo</span>
-      <span class="badge">Rende todo dia</span>
+        <div class="panel-badges">
+          <span class="badge">Seguro</span>
+          <span class="badge">Instantâneo</span>
+          <span class="badge">Rende todo dia</span>
+        </div>
+      </div>
+
+      <div class="panel-copy">
+        <h1>
+          Seu dinheiro,<br />
+          <em>do seu jeito.</em>
+        </h1>
+        <p>
+          Carteira digital com rendimentos automáticos e cofrinhos para seus objetivos.
+        </p>
+      </div>
     </div>
   </aside>
 
-  <!-- RIGHT PANEL — formulário -->
+  <!-- RIGHT PANEL -->
   <main class="auth-form-area">
-    <!-- Tabs -->
-    <div class="auth-tabs">
-      <button
-        class="tab-btn"
-        [class.tab-btn--active]="activeTab === 'cadastro'"
-        (click)="activeTab = 'cadastro'"
-        type="button"
-      >
-        Criar conta
-      </button>
-      <button
-        class="tab-btn"
-        [class.tab-btn--active]="activeTab === 'login'"
-        (click)="activeTab = 'login'"
-        type="button"
-      >
-        Entrar
-      </button>
-    </div>
-
-    <!-- CADASTRO -->
-    <div class="auth-card" *ngIf="activeTab === 'cadastro'">
-      <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
-        <div class="field">
-          <label for="fullName">Nome completo</label>
-          <input id="fullName" type="text" placeholder="João da Silva" formControlName="fullName" />
-        </div>
-
-        <div class="field">
-          <label for="email">E-mail</label>
-          <input id="email" type="email" placeholder="joao@email.com" formControlName="email" />
-        </div>
-
-        <div class="field">
-          <label for="documentNumber">CPF</label>
-          <input id="documentNumber" type="text" placeholder="000.000.000-00" formControlName="documentNumber" />
-        </div>
-
-        <button class="submit-btn" type="submit" [disabled]="isSubmitting">
-          <span *ngIf="!isSubmitting">Criar minha conta →</span>
-          <span *ngIf="isSubmitting" class="spinner">Criando…</span>
+    <div class="auth-form-box">
+      <div class="auth-tabs">
+        <button
+          class="tab-btn"
+          [class.tab-btn--active]="activeTab === 'cadastro'"
+          (click)="activeTab = 'cadastro'"
+          type="button"
+        >
+          Criar conta
         </button>
 
-        <p class="error-msg" *ngIf="errorMessage">{{ errorMessage }}</p>
-
-        <p class="helper">
-          Já tem uma conta?
-          <button type="button" class="link-btn" (click)="activeTab = 'login'">Entrar</button>
-        </p>
-      </form>
-    </div>
-
-    <!-- LOGIN (simples) -->
-    <div class="auth-card" *ngIf="activeTab === 'login'">
-      <form class="auth-form" (ngSubmit)="submitLogin()">
-        <div class="field">
-          <label for="loginEmail">E-mail</label>
-          <input id="loginEmail" type="email" placeholder="joao@email.com" [(ngModel)]="loginEmail" name="loginEmail" />
-        </div>
-
-        <div class="field">
-          <label for="loginDoc">CPF</label>
-          <input id="loginDoc" type="text" placeholder="000.000.000-00" [(ngModel)]="loginDoc" name="loginDoc" />
-        </div>
-
-        <button class="submit-btn" type="submit" [disabled]="isSubmittingLogin">
-          <span *ngIf="!isSubmittingLogin">Entrar →</span>
-          <span *ngIf="isSubmittingLogin" class="spinner">Entrando…</span>
+        <button
+          class="tab-btn"
+          [class.tab-btn--active]="activeTab === 'login'"
+          (click)="activeTab = 'login'"
+          type="button"
+        >
+          Entrar
         </button>
+      </div>
 
-        <p class="error-msg" *ngIf="loginError">{{ loginError }}</p>
+      <!-- CADASTRO -->
+      <div class="auth-card" *ngIf="activeTab === 'cadastro'">
+        <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
+          <div class="auth-card-copy">
+            <h2>Abra sua conta</h2>
+            <p>Comece agora e organize seu dinheiro com mais clareza.</p>
+          </div>
 
-        <p class="helper">
-          Ainda não tem conta?
-          <button type="button" class="link-btn" (click)="activeTab = 'cadastro'">Criar agora</button>
-        </p>
-      </form>
+          <div class="field">
+            <label for="fullName">Nome completo</label>
+            <input
+              id="fullName"
+              type="text"
+              placeholder="João da Silva"
+              formControlName="fullName"
+            />
+          </div>
+
+          <div class="field">
+            <label for="email">E-mail</label>
+            <input
+              id="email"
+              type="email"
+              placeholder="joao@email.com"
+              formControlName="email"
+            />
+          </div>
+
+          <div class="field">
+            <label for="documentNumber">CPF</label>
+            <input
+              id="documentNumber"
+              type="text"
+              placeholder="000.000.000-00"
+              formControlName="documentNumber"
+            />
+          </div>
+
+          <button class="submit-btn" type="submit" [disabled]="isSubmitting">
+            <span *ngIf="!isSubmitting">Criar minha conta →</span>
+            <span *ngIf="isSubmitting" class="spinner">Criando…</span>
+          </button>
+
+          <p class="error-msg" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+          <p class="helper">
+            Já tem uma conta?
+            <button
+              type="button"
+              class="link-btn"
+              (click)="activeTab = 'login'"
+            >
+              Entrar
+            </button>
+          </p>
+        </form>
+      </div>
+
+      <!-- LOGIN -->
+      <div class="auth-card" *ngIf="activeTab === 'login'">
+        <form class="auth-form" (ngSubmit)="submitLogin()">
+          <div class="auth-card-copy">
+            <h2>Entre na sua conta</h2>
+            <p>Acesse sua carteira e acompanhe seus objetivos.</p>
+          </div>
+
+          <div class="field">
+            <label for="loginEmail">E-mail</label>
+            <input
+              id="loginEmail"
+              type="email"
+              placeholder="joao@email.com"
+              [(ngModel)]="loginEmail"
+              name="loginEmail"
+            />
+          </div>
+
+          <div class="field">
+            <label for="loginDoc">CPF</label>
+            <input
+              id="loginDoc"
+              type="text"
+              placeholder="000.000.000-00"
+              [(ngModel)]="loginDoc"
+              name="loginDoc"
+            />
+          </div>
+
+          <button class="submit-btn" type="submit" [disabled]="isSubmittingLogin">
+            <span *ngIf="!isSubmittingLogin">Entrar →</span>
+            <span *ngIf="isSubmittingLogin" class="spinner">Entrando…</span>
+          </button>
+
+          <p class="error-msg" *ngIf="loginError">{{ loginError }}</p>
+
+          <p class="helper">
+            Ainda não tem conta?
+            <button
+              type="button"
+              class="link-btn"
+              (click)="activeTab = 'cadastro'"
+            >
+              Criar agora
+            </button>
+          </p>
+        </form>
+      </div>
     </div>
   </main>
 </div>
-

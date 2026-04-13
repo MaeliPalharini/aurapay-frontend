@@ -16,6 +16,7 @@ $white:       #FFFFFF;
 
 .wallet-page-wrapper {
   min-height: 100vh;
+  max-width: 100%;
   padding: 32px clamp(20px, 4vw, 40px) 48px;
   color: $ink;
   background:
@@ -25,7 +26,7 @@ $white:       #FFFFFF;
 }
 
 .wallet-page {
-  max-width: 1240px;
+  width: 1900px;
   margin: 100px auto;
   padding: clamp(20px, 3vw, 32px);
   border-radius: 32px;
@@ -37,14 +38,16 @@ $white:       #FFFFFF;
 
 .wallet-header {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 24px;
+  align-items: center;
+  gap: 5px;
   margin-bottom: 28px;
+  margin-left: 30px;
 
   h2 {
     margin: 0;
-    font-size: clamp(2rem, 3vw, 2.6rem);
+    font-size: 50px;
     font-weight: 800;
     color: $ink;
     letter-spacing: -0.03em;
@@ -52,10 +55,11 @@ $white:       #FFFFFF;
 
   p {
     margin: 10px 0 0;
-    max-width: 520px;
-    font-size: 1rem;
-    line-height: 1.5;
+    max-width: 100%;
+    font-size: 30px;
+    line-height: 1.0;
     color: $muted;
+
   }
 }
 
@@ -575,6 +579,8 @@ $white:       #FFFFFF;
 
   .wallet-page-wrapper {
     padding: 20px 16px 32px;
+    width-max: 100%;
+    font-size: 20px;
   }
 
   .wallet-page {
@@ -586,7 +592,7 @@ $white:       #FFFFFF;
     margin-bottom: 22px;
 
     h2 {
-      font-size: 1.8rem;
+      font-size: 50px;
     }
 
     p {

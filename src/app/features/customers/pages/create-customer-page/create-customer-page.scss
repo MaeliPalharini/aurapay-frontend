@@ -6,11 +6,12 @@ $teal-pale:   #E0F5F2;
 $orange:      #F4631E;
 $orange-deep: #D94F10;
 $orange-pale: #FEE8DC;
-$peach:       #ff9d7d;
+$peach:       #FF9D7D;
 $ink:         #0E2724;
 $muted:       #4A706C;
 $surface:     #F5FBFA;
 $white:       #FFFFFF;
+$navy:        #0D294C;
 
 :host {
   display: block;
@@ -19,27 +20,34 @@ $white:       #FFFFFF;
 
 .auth-shell {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
+  grid-template-columns: minmax(540px, 1.08fr) minmax(620px, 0.92fr);
   min-height: 100vh;
   font-family: 'Sora', sans-serif;
+  background: $surface;
 
-  @media (max-width: 960px) {
+  @media (max-width: 1100px) {
     grid-template-columns: 1fr;
   }
 }
 
-// ─── PAINEL ESQUERDO ───
+// ─────────────────────────────
+// LEFT PANEL
+// ─────────────────────────────
 .auth-panel {
   position: relative;
   overflow: hidden;
+  min-height: 100vh;
+  padding: clamp(28px, 4vw, 48px);
   display: flex;
-  flex-direction: column;
-  justify-content: flex-end; // Empurra tudo para baixo
-  padding: 3rem;
+  align-items: stretch;
 
-  @media (max-width: 960px) {
-    min-height: 400px;
-    padding: 2rem;
+  @media (max-width: 1100px) {
+    min-height: 680px;
+  }
+
+  @media (max-width: 700px) {
+    min-height: 560px;
+    padding: 22px;
   }
 }
 
@@ -52,27 +60,100 @@ $white:       #FFFFFF;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
   }
+}
 
-  .panel-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba($teal-dark, 0.8) 0%, transparent 60%);
-  }
+.panel-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba($teal-dark, 0.26) 0%, rgba($teal-dark, 0.06) 30%, rgba($teal-dark, 0.18) 100%),
+    linear-gradient(180deg, rgba($ink, 0.10) 0%, rgba($ink, 0.18) 100%);
+}
+
+.panel-image-glow {
+  position: absolute;
+  inset: auto auto -120px -120px;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba($orange, 0.22) 0%, rgba($orange, 0) 72%);
+  filter: blur(16px);
 }
 
 .panel-content {
   position: relative;
   z-index: 2;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.panel-top {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.panel-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  width: fit-content;
+  padding: 14px 18px;
+  border-radius: 18px;
+  background: rgba($white, 0.14);
+  border: 1px solid rgba($white, 0.22);
+  backdrop-filter: blur(12px);
+}
+
+.brand-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, $orange 0%, $peach 100%);
+  box-shadow: 0 0 0 6px rgba($orange, 0.14);
+}
+
+.brand-name {
+  color: $white;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.panel-badges {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba($white, 0.16);
+  backdrop-filter: blur(10px);
+  color: $white;
+  font-size: 0.92rem;
+  font-weight: 700;
+  border: 1px solid rgba($white, 0.24);
+  box-shadow: 0 8px 20px rgba($ink, 0.08);
 }
 
 .panel-copy {
+  max-width: 760px;
+  padding-bottom: 16px;
+
   h1 {
-    font-size: clamp(2rem, 4vw, 3rem);
+    margin: 0 0 18px;
+    font-size: clamp(4.5rem, 8vw, 7.5rem);
     font-weight: 800;
+    line-height: 0.9;
+    letter-spacing: -0.05em;
     color: $white;
-    line-height: 1.1;
-    margin: 0;
+    text-wrap: balance;
 
     em {
       font-style: normal;
@@ -81,134 +162,227 @@ $white:       #FFFFFF;
   }
 
   p {
-    margin: 1.5rem 0;
-    color: rgba($white, 0.9);
-    font-size: 1.1rem; // Estava 2.0rem (muito grande)
+    margin: 0;
+    color: rgba($white, 0.96);
+    font-size: clamp(1.08rem, 1.8vw, 1.35rem);
     line-height: 1.5;
-    max-width: 450px;
+    max-width: 560px;
+    font-weight: 500;
   }
 }
 
-.panel-badges {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-
-  .badge {
-    padding: 8px 16px;
-    border-radius: 999px;
-    background: rgba($white, 0.15);
-    backdrop-filter: blur(8px);
-    color: $white;
-    font-size: 0.85rem;
-    font-weight: 600;
-    border: 1px solid rgba($white, 0.2);
-  }
-}
-
-// ─── PAINEL DIREITO ───
+// ─────────────────────────────
+// RIGHT PANEL
+// ─────────────────────────────
 .auth-form-area {
-  background: $surface;
+  background:
+    radial-gradient(circle at top left, rgba($teal, 0.08) 0%, transparent 28%),
+    radial-gradient(circle at bottom right, rgba($orange, 0.08) 0%, transparent 28%),
+    linear-gradient(180deg, #EEF8F6 0%, $surface 100%);
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
-  gap: 2rem;
+  padding: clamp(36px, 5vw, 72px);
+}
+
+.auth-form-box {
+  width: min(100%, 680px);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
 }
 
 .auth-tabs {
   display: flex;
-  background: darken($surface, 3%);
-  padding: 4px;
-  border-radius: 12px;
+  background: rgba($teal, 0.08);
+  padding: 6px;
+  border-radius: 16px;
   width: 100%;
-  max-width: 400px;
+  box-shadow: inset 0 0 0 1px rgba($teal-dark, 0.06);
 
   .tab-btn {
     flex: 1;
     border: none;
-    padding: 12px;
-    border-radius: 10px;
+    padding: 16px 18px;
+    border-radius: 14px;
     background: transparent;
-    font-weight: 700;
+    font-weight: 800;
+    font-size: 1.02rem;
     color: $muted;
     cursor: pointer;
-    transition: 0.2s;
+    transition: 0.2s ease;
 
     &--active {
       background: $white;
       color: $teal-dark;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      box-shadow: 0 10px 24px rgba($teal-dark, 0.08);
     }
   }
 }
 
 .auth-card {
   width: 100%;
-  max-width: 450px;
-  background: $white;
-  padding: 2.5rem;
-  border-radius: 24px;
-  box-shadow: 0 20px 40px rgba($teal-dark, 0.05);
+  background: rgba($white, 0.96);
+  padding: 42px;
+  border-radius: 32px;
+  border: 1px solid rgba($teal-dark, 0.06);
+  box-shadow: 0 24px 50px rgba($teal-dark, 0.08);
+
+  @media (max-width: 600px) {
+    padding: 24px;
+    border-radius: 22px;
+  }
 }
 
-// Reutilizando seus estilos de Wallet e Inputs que já estavam bons
-.wallet-preview {
-  background: linear-gradient(135deg, $teal 0%, $teal-dark 100%);
-  border-radius: 16px;
-  padding: 1.25rem;
-  color: $white;
-  margin-bottom: 2rem;
+.auth-card-copy {
+  margin-bottom: 28px;
 
-  .wp-label { font-size: 0.7rem; opacity: 0.8; text-transform: uppercase; font-weight: 700; }
-  .wp-badge { background: $orange; padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; float: right; }
-  .wp-name { font-size: 1.2rem; font-weight: 700; margin: 10px 0 5px; }
-  .wp-status { font-size: 0.8rem; opacity: 0.7; }
+  h2 {
+    margin: 0 0 10px;
+    font-size: 2.1rem;
+    font-weight: 800;
+    color: $ink;
+    letter-spacing: -0.03em;
+  }
+
+  p {
+    margin: 0;
+    color: $muted;
+    font-size: 1.08rem;
+    line-height: 1.6;
+  }
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
 }
 
 .field {
-  margin-bottom: 1.2rem;
+  margin-bottom: 18px;
   display: flex;
   flex-direction: column;
   gap: 8px;
 
-  label { font-size: 0.9rem; font-weight: 700; color: $ink; }
+  label {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: $ink;
+  }
+
   input {
-    height: 54px;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
+    height: 58px;
+    border-radius: 14px;
+    border: 1px solid rgba($teal-dark, 0.12);
     padding: 0 16px;
-    background: #f8fafc;
-    transition: 0.2s;
-    &:focus { border-color: $teal; outline: none; background: $white; box-shadow: 0 0 0 4px rgba($teal, 0.1); }
+    background: #F8FCFB;
+    color: $ink;
+    font-size: 1rem;
+    transition: 0.2s ease;
+
+    &::placeholder {
+      color: rgba($muted, 0.7);
+    }
+
+    &:focus {
+      border-color: $teal;
+      outline: none;
+      background: $white;
+      box-shadow: 0 0 0 4px rgba($teal, 0.12);
+    }
   }
 }
 
 .submit-btn {
   width: 100%;
-  height: 54px;
-  background: linear-gradient(90deg, $orange, $orange-deep);
+  height: 58px;
+  background: linear-gradient(90deg, $orange 0%, $orange-deep 100%);
   color: $white;
   border: none;
-  border-radius: 12px;
-  font-weight: 700;
+  border-radius: 14px;
+  font-weight: 800;
   font-size: 1rem;
   cursor: pointer;
-  margin: 1rem 0;
-  transition: 0.2s;
+  margin: 8px 0 14px;
+  transition: 0.2s ease;
+  box-shadow: 0 14px 28px rgba($orange, 0.18);
 
-  &:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 20px rgba($orange, 0.2); }
-  &:disabled { opacity: 0.5; }
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: inset 0 0 0 1px rgba($teal-dark, 0.06);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
 }
 
-.switch-hint { font-size: 0.9rem; color: $muted; text-align: center; }
-.link-btn { background: none; border: none; color: $orange; font-weight: 700; cursor: pointer; text-decoration: underline; }
+.error-msg {
+  margin: 0 0 12px;
+  color: #B42318;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
 
-.login-hero {
+.helper {
+  margin: 0;
   text-align: center;
-  margin-bottom: 2rem;
-  .login-icon { font-size: 2.5rem; }
-  h2 { font-size: 1.5rem; font-weight: 800; color: $ink; margin: 10px 0; }
-  p { color: $muted; font-size: 0.95rem; }
+  color: $muted;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: $orange;
+  font-weight: 800;
+  cursor: pointer;
+  padding: 0;
+}
+
+.spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// ─────────────────────────────
+// RESPONSIVO
+// ─────────────────────────────
+@media (max-width: 1100px) {
+  .auth-form-area {
+    padding-top: 36px;
+    padding-bottom: 36px;
+  }
+
+  .panel-copy {
+    max-width: 680px;
+  }
+}
+
+@media (max-width: 700px) {
+  :host {
+    margin: -16px;
+  }
+
+  .panel-copy h1 {
+    font-size: clamp(3rem, 14vw, 4.6rem);
+  }
+
+  .panel-copy p {
+    font-size: 1rem;
+    max-width: 100%;
+  }
+
+  .badge {
+    font-size: 0.84rem;
+    padding: 9px 14px;
+  }
+
+  .auth-form-box {
+    width: 100%;
+  }
 }
