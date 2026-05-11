@@ -1,0 +1,146 @@
+<div class="pix-page-wrapper">
+  <div class="pix-page">
+
+    <header class="pix-header">
+      <h2>Área Pix</h2>
+      <p>Adicione saldo à sua carteira AuraPay em segundos via Pix.</p>
+    </header>
+
+    <!-- Chaves Pix do usuário (visível só na tela do formulário) -->
+    <app-pix-keys-section
+      *ngIf="viewState === 'form' && customerId"
+      [customerId]="customerId"
+    ></app-pix-keys-section>
+
+    <!-- Estado: Formulário -->
+    <section class="pix-card" *ngIf="viewState === 'form'">
+      <header class="pix-form__header">
+        <h3>Cobrar via Pix</h3>
+      </header>
+
+      <form class="pix-form" [formGroup]="form" (ngSubmit)="submit()">
+        <label>
+          Valor da cobrança
+          <input type="number" min="0.01" step="0.01" formControlName="amount" placeholder="Ex.: 25,50" />
+          <small class="field-error" *ngIf="form.get('amount')?.touched && form.get('amount')?.invalid">
+            Informe um valor maior que zero.
+          </small>
+        </label>
+
+        <label>
+          E-mail do pagador (opcional)
+          <input type="email" formControlName="payerEmail" placeholder="seu-email@exemplo.com" />
+          <small class="field-hint">
+            Se preenchido, o Mercado Pago usa este e-mail para a cobrança.
+          </small>
+        </label>
+
+        <div class="alert alert-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+        <div class="pix-actions">
+          <a class="btn btn-pill btn-ghost" routerLink="/wallet">Voltar</a>
+          <button class="btn btn-pill btn-primary" type="submit" [disabled]="form.invalid">
+            Gerar cobrança Pix
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Estado: Loading -->
+    <section class="pix-card pix-card--center" *ngIf="viewState === 'loading'">
+      <div class="loader-ring" aria-hidden="true"></div>
+      <p class="loading-text">Gerando QR Code…</p>
+    </section>
+
+    <!-- Estado: QR Code pronto -->
+    <section class="pix-card" *ngIf="viewState === 'qrcode' && payment">
+      <div class="qr-summary">
+        <span class="pix-label">VALOR DO PIX</span>
+        <strong class="qr-amount">{{ payment.amount | currency:'BRL' }}</strong>
+      </div>
+
+      <div class="qr-area">
+        <div class="qr-image" *ngIf="qrCodeImageSrc(); else noImageBlock">
+          <img [src]="qrCodeImageSrc()" alt="QR Code Pix para pagamento" />
+        </div>
+        <ng-template #noImageBlock>
+          <div class="qr-image qr-image--missing">
+            <span>QR Code indisponível.</span>
+            <small>Use o código copia-e-cola abaixo.</small>
+          </div>
+        </ng-template>
+
+        <div class="qr-meta">
+          <div class="timer" [class.timer--warn]="expiringSoon">
+            <span class="pix-label">Tempo restante</span>
+            <strong>{{ formatRemaining() }}</strong>
+            <span class="timer-warning" *ngIf="expiringSoon">Pagamento prestes a expirar</span>
+          </div>
+
+          <p class="awaiting">Aguardando pagamento…</p>
+        </div>
+      </div>
+
+      <div class="copy-block">
+        <span class="pix-label">CÓDIGO COPIA-E-COLA</span>
+        <div class="copy-row">
+          <code>{{ payment.qrCode }}</code>
+          <button class="btn btn-pill btn-outline-ink" type="button" (click)="copyKey()">
+            <span *ngIf="!copied">Copiar código</span>
+            <span *ngIf="copied">Copiado!</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="pix-actions">
+        <a
+          *ngIf="payment.ticketUrl"
+          class="btn btn-pill btn-ghost"
+          [href]="payment.ticketUrl"
+          target="_blank"
+          rel="noreferrer noopener"
+        >
+          Abrir no Mercado Pago
+        </a>
+        <button class="btn btn-pill btn-ghost" type="button" (click)="retry()">Cancelar</button>
+        <button class="btn btn-pill btn-primary" type="button" (click)="checkNow()">Já paguei</button>
+      </div>
+    </section>
+
+    <!-- Estado: Sucesso -->
+    <section class="pix-card pix-card--center" *ngIf="viewState === 'success' && finalPayment">
+      <div class="status-icon status-icon--success" aria-hidden="true">✓</div>
+      <h3>Saldo adicionado!</h3>
+      <p class="success-amount">{{ finalPayment.amount | currency:'BRL' }} adicionados à sua carteira.</p>
+      <p class="success-message">Sua carteira AuraPay foi creditada com sucesso.</p>
+
+      <dl class="receipt">
+        <div>
+          <dt>ID da cobrança</dt>
+          <dd>#{{ finalPayment.id }}</dd>
+        </div>
+        <div *ngIf="finalPayment.updatedAt">
+          <dt>Confirmado em</dt>
+          <dd>{{ finalPayment.updatedAt | date:'dd/MM/yyyy HH:mm' }}</dd>
+        </div>
+      </dl>
+
+      <div class="pix-actions pix-actions--center">
+        <a class="btn btn-pill btn-primary" routerLink="/wallet">Ver saldo</a>
+      </div>
+    </section>
+
+    <!-- Estado: Erro -->
+    <section class="pix-card pix-card--center" *ngIf="viewState === 'error'">
+      <div class="status-icon status-icon--error" aria-hidden="true">!</div>
+      <h3>Não foi possível concluir o depósito</h3>
+      <p class="error-detail">{{ errorMessage || 'Tente novamente em alguns instantes.' }}</p>
+
+      <div class="pix-actions pix-actions--center">
+        <a class="btn btn-pill btn-ghost" routerLink="/wallet">Voltar para a carteira</a>
+        <button class="btn btn-pill btn-primary" type="button" (click)="retry()">Tentar novamente</button>
+      </div>
+    </section>
+
+  </div>
+</div>

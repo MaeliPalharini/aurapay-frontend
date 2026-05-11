@@ -10,7 +10,8 @@ import { CreateCustomerPage } from './features/customers/pages/create-customer-p
 import { WalletDetailsPage } from './features/wallet/pages/wallet-details-page/wallet-details-page';
 import { PiggyBankPage } from './features/piggy-banks/pages/piggy-bank-page/piggy-bank-page';
 import { PiggyBankDetailsPage } from './features/piggy-banks/pages/piggy-bank-details-page/piggy-bank-details-page';
-import { TransferPage } from './features/transfer/pages/transfer-page/transfer-page';
+import { DepositPixPage } from './features/wallet/pages/deposit-pix-page/deposit-pix-page';
+import { PixKeysSection } from './features/wallet/components/pix-keys-section/pix-keys-section';
 
 // @ts-ignore
 @NgModule({
@@ -20,7 +21,8 @@ import { TransferPage } from './features/transfer/pages/transfer-page/transfer-p
     WalletDetailsPage,
     PiggyBankPage,
     PiggyBankDetailsPage,
-    TransferPage
+    DepositPixPage,
+    PixKeysSection
   ],
   imports: [
     BrowserModule,

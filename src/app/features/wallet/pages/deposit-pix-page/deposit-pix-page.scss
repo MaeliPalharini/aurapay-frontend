@@ -1,0 +1,507 @@
+// Paleta AuraPay (alinhada com wallet-details-page)
+$teal-dark: #79ccc2;
+$teal:        #2A9D8F;
+$teal-light:  #4DB6A8;
+$orange:      #F4631E;
+$peach:       #ff9d7d;
+$ink:         #0E2724;
+$muted:       #4A706C;
+$surface:     #F5FBFA;
+$white:       #FFFFFF;
+$danger:      #d64545;
+
+:host {
+  display: block;
+  margin: -28px;
+}
+
+.pix-page-wrapper {
+  min-height: 100vh;
+  padding: 32px clamp(20px, 4vw, 40px) 48px;
+  color: $ink;
+  background:
+    radial-gradient(circle at top right, rgba($orange, 0.12) 0%, transparent 22%),
+    radial-gradient(circle at left center, rgba($teal, 0.12) 0%, transparent 26%),
+    linear-gradient(180deg, #eef8f6 0%, #dcedea 100%);
+}
+
+.pix-page {
+  width: 100%;
+  max-width: 920px;
+  margin: 60px auto;
+  padding: clamp(20px, 3vw, 32px);
+  border-radius: 32px;
+  background: rgba($white, 0.42);
+  border: 1px solid rgba($white, 0.8);
+  box-shadow: 0 24px 80px rgba(14, 39, 36, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.pix-header {
+  text-align: center;
+  margin-bottom: 28px;
+
+  h2 {
+    margin: 0;
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    font-weight: 800;
+    color: $ink;
+    letter-spacing: -0.03em;
+  }
+
+  p {
+    margin: 12px auto 0;
+    max-width: 520px;
+    color: $muted;
+    font-size: 1.1rem;
+    line-height: 1.4;
+  }
+}
+
+.pix-card {
+  background: rgba($white, 0.96);
+  border-radius: 28px;
+  padding: 32px;
+  border: 1px solid rgba($ink, 0.05);
+  box-shadow: 0 14px 40px rgba(14, 39, 36, 0.06);
+}
+
+.pix-card--center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+}
+
+.pix-label {
+  display: inline-block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: $muted;
+  text-transform: uppercase;
+}
+
+// ─── Cabeçalho do card de cobrança ─────────────────────────────────
+.pix-form__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+
+  h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: $ink;
+  }
+}
+
+// ─── Form ──────────────────────────────────────────────────────────
+.pix-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-weight: 700;
+    color: $ink;
+  }
+
+  input {
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1px solid rgba($teal, 0.25);
+    background: rgba($white, 0.95);
+    color: $ink;
+    font-size: 1rem;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: rgba($teal, 0.55);
+    box-shadow: 0 0 0 4px rgba($teal, 0.16);
+  }
+
+  .field-error {
+    color: $danger;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  .field-hint {
+    color: $muted;
+    font-weight: 500;
+    font-size: 0.85rem;
+  }
+}
+
+.pix-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.pix-actions--end {
+  justify-content: flex-end;
+}
+
+.pix-actions--center {
+  justify-content: center;
+}
+
+// ─── Botões ────────────────────────────────────────────────────────
+.btn {
+  border: none;
+  cursor: pointer;
+  transition: 0.2s ease;
+  font-weight: 800;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.btn-pill {
+  padding: 14px 24px;
+  border-radius: 999px;
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, $orange, darken($orange, 10%));
+  color: $white;
+  box-shadow: 0 10px 24px rgba($orange, 0.28);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 32px rgba($orange, 0.32);
+  }
+}
+
+.btn-ghost {
+  background: rgba($white, 0.9);
+  color: $ink;
+  border: 1px solid rgba($teal, 0.18);
+
+  &:hover {
+    background: rgba($teal, 0.06);
+  }
+}
+
+.btn-outline-ink {
+  background: rgba($teal, 0.10);
+  color: darken($teal, 12%);
+  border: 1px solid rgba($teal, 0.28);
+
+  &:hover {
+    background: rgba($teal, 0.16);
+  }
+}
+
+.btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+// ─── Alerts ────────────────────────────────────────────────────────
+.alert {
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-weight: 600;
+
+  &.alert-error {
+    background: rgba($danger, 0.08);
+    color: #9e2f2f;
+    border: 1px solid rgba($danger, 0.14);
+  }
+}
+
+// ─── QR Code ───────────────────────────────────────────────────────
+.qr-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.qr-amount {
+  font-size: clamp(2rem, 4vw, 2.6rem);
+  letter-spacing: -0.03em;
+  color: $ink;
+}
+
+.qr-area {
+  display: grid;
+  grid-template-columns: minmax(0, 280px) minmax(0, 1fr);
+  gap: 28px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.qr-image {
+  width: 260px;
+  height: 260px;
+  border-radius: 24px;
+  background: $white;
+  border: 1px solid rgba($teal, 0.15);
+  box-shadow: 0 14px 36px rgba(14, 39, 36, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+  }
+
+  &--missing {
+    flex-direction: column;
+    gap: 6px;
+    color: $muted;
+    text-align: center;
+    font-weight: 600;
+
+    small {
+      font-weight: 500;
+      color: rgba($muted, 0.85);
+    }
+  }
+}
+
+.qr-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.timer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba($teal, 0.22);
+  background: rgba($teal, 0.06);
+
+  strong {
+    font-size: 1.6rem;
+    color: darken($teal, 14%);
+    letter-spacing: 0.04em;
+  }
+
+  &--warn {
+    border-color: rgba($orange, 0.40);
+    background: rgba($orange, 0.10);
+
+    strong {
+      color: darken($orange, 6%);
+    }
+  }
+
+  .timer-warning {
+    color: darken($orange, 8%);
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+}
+
+.awaiting {
+  margin: 0;
+  color: $muted;
+  font-weight: 600;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 8px;
+    background: $teal;
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes pulse {
+  0%   { transform: scale(1);   opacity: 0.6; }
+  50%  { transform: scale(1.4); opacity: 1; }
+  100% { transform: scale(1);   opacity: 0.6; }
+}
+
+// ─── Copia-e-cola ──────────────────────────────────────────────────
+.copy-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.copy-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: stretch;
+
+  code {
+    display: block;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: rgba($ink, 0.04);
+    border: 1px solid rgba($ink, 0.08);
+    color: $ink;
+    font-family: 'Menlo', 'Consolas', monospace;
+    font-size: 0.9rem;
+    word-break: break-all;
+    line-height: 1.4;
+    max-height: 88px;
+    overflow: auto;
+  }
+}
+
+// ─── Loader ────────────────────────────────────────────────────────
+.loader-ring {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 4px solid rgba($teal, 0.18);
+  border-top-color: $teal;
+  animation: spin 0.9s linear infinite;
+}
+
+.loading-text {
+  margin: 0;
+  color: $muted;
+  font-weight: 600;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// ─── Sucesso / Erro ────────────────────────────────────────────────
+.status-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 800;
+  color: $white;
+  box-shadow: 0 12px 28px rgba(14, 39, 36, 0.12);
+}
+
+.status-icon--success {
+  background: linear-gradient(135deg, $teal 0%, darken($teal, 10%) 100%);
+}
+
+.status-icon--error {
+  background: linear-gradient(135deg, $danger 0%, darken($danger, 10%) 100%);
+}
+
+.success-amount {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 800;
+  color: darken($teal, 12%);
+}
+
+.success-message {
+  margin: 0;
+  color: $muted;
+}
+
+.error-detail {
+  margin: 0;
+  color: $muted;
+  max-width: 480px;
+}
+
+.receipt {
+  margin: 18px 0 4px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  width: 100%;
+  max-width: 480px;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: rgba($teal, 0.06);
+    border: 1px solid rgba($teal, 0.14);
+    text-align: left;
+  }
+
+  dt {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: $muted;
+    font-weight: 700;
+  }
+
+  dd {
+    margin: 0;
+    color: $ink;
+    font-weight: 600;
+    word-break: break-all;
+  }
+}
+
+// ─── Responsivo ────────────────────────────────────────────────────
+@media (max-width: 720px) {
+  :host {
+    margin: -16px;
+  }
+
+  .pix-page-wrapper {
+    padding: 20px 16px 32px;
+  }
+
+  .pix-page {
+    margin: 24px auto;
+    padding: 18px;
+    border-radius: 24px;
+  }
+
+  .pix-card {
+    padding: 22px;
+    border-radius: 22px;
+  }
+
+  .qr-area {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .pix-actions {
+    flex-direction: column;
+    align-items: stretch;
+
+    .btn {
+      width: 100%;
+    }
+  }
+
+  .copy-row {
+    grid-template-columns: 1fr;
+  }
+}

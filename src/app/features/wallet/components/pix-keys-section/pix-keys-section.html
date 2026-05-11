@@ -1,0 +1,52 @@
+<section class="pix-keys" aria-labelledby="pix-keys-title">
+  <header class="pix-keys__header">
+    <h3 id="pix-keys-title">Minhas Chaves Pix</h3>
+    <span class="pix-keys__counter" *ngIf="!isLoading">
+      {{ keys.length }} / {{ maxKeys }}
+    </span>
+  </header>
+
+  <button
+    type="button"
+    class="btn btn-pill btn-primary pix-keys__create"
+    [disabled]="isCreating || limitReached || !customerId"
+    (click)="createKey()"
+  >
+    <span *ngIf="!isCreating">+ Gerar chave Pix aleatória</span>
+    <span *ngIf="isCreating">Gerando…</span>
+  </button>
+
+  <p class="pix-keys__hint" *ngIf="limitReached && !isLoading">
+    Você atingiu o limite de {{ maxKeys }} chaves Pix.
+  </p>
+
+  <div class="alert alert-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+  <div class="pix-keys__loading" *ngIf="isLoading">Carregando chaves…</div>
+
+  <p class="pix-keys__empty" *ngIf="!isLoading && keys.length === 0 && !errorMessage">
+    Você ainda não tem chaves Pix cadastradas.
+  </p>
+
+  <ul class="pix-keys__list" *ngIf="!isLoading && keys.length > 0">
+    <li class="pix-key" *ngFor="let key of keys; trackBy: trackByKeyId">
+      <div class="pix-key__info">
+        <span class="pix-key__icon" aria-hidden="true">🔑</span>
+        <div class="pix-key__text">
+          <code class="pix-key__value">{{ key.keyValue }}</code>
+          <small class="pix-key__date">
+            Criada em {{ key.createdAt | date:'dd/MM/yyyy HH:mm' }}
+          </small>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="btn btn-pill btn-outline-ink pix-key__copy"
+        (click)="copyKey(key)"
+      >
+        <span *ngIf="copiedKeyId !== key.id">Copiar</span>
+        <span *ngIf="copiedKeyId === key.id">Copiado!</span>
+      </button>
+    </li>
+  </ul>
+</section>
