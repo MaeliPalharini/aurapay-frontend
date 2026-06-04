@@ -21,7 +21,9 @@ $navy:        #0D294C;
 .auth-shell {
   display: grid;
   grid-template-columns: minmax(540px, 1.08fr) minmax(620px, 0.92fr);
-  min-height: 100vh;
+  // Desconta o padding (16px x2) do .app-shell que envolve esta página,
+  // senão 100vh + 32px estoura a viewport e rola a página inteira.
+  min-height: calc(100vh - 32px);
   font-family: 'Sora', sans-serif;
   background: $surface;
 
@@ -36,7 +38,7 @@ $navy:        #0D294C;
 .auth-panel {
   position: relative;
   overflow: hidden;
-  min-height: 100vh;
+  min-height: calc(100vh - 32px);
   padding: clamp(28px, 4vw, 48px);
   display: flex;
   align-items: stretch;
@@ -223,7 +225,7 @@ $navy:        #0D294C;
 .auth-card {
   width: 100%;
   background: rgba($white, 0.96);
-  padding: 42px;
+  padding: 32px 42px;
   border-radius: 32px;
   border: 1px solid rgba($teal-dark, 0.06);
   box-shadow: 0 24px 50px rgba($teal-dark, 0.08);
@@ -235,7 +237,7 @@ $navy:        #0D294C;
 }
 
 .auth-card-copy {
-  margin-bottom: 28px;
+  margin-bottom: 20px;
 
   h2 {
     margin: 0 0 10px;
@@ -259,10 +261,10 @@ $navy:        #0D294C;
 }
 
 .field {
-  margin-bottom: 18px;
+  margin-bottom: 14px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 
   label {
     font-size: 0.95rem;
@@ -271,7 +273,7 @@ $navy:        #0D294C;
   }
 
   input {
-    height: 58px;
+    height: 52px;
     border-radius: 14px;
     border: 1px solid rgba($teal-dark, 0.12);
     padding: 0 16px;

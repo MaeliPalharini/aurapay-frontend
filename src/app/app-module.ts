@@ -2,9 +2,10 @@ import { NgModule, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing-module';
+import { AuthInterceptor } from './core/auth/auth.interceptor';
 import { App } from './app';
 import { CreateCustomerPage } from './features/customers/pages/create-customer-page/create-customer-page';
 import { WalletDetailsPage } from './features/wallet/pages/wallet-details-page/wallet-details-page';
@@ -33,7 +34,8 @@ import { PixKeysSection } from './features/wallet/components/pix-keys-section/pi
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideHttpClient(withInterceptorsFromDi())
+    provideHttpClient(withInterceptorsFromDi()),
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
   ],
   bootstrap: [App]
 })

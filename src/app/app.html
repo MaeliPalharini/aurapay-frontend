@@ -11,6 +11,15 @@
       <a routerLink="/pix" routerLinkActive="active">Área Pix</a>
 <!--      <a routerLink="/pix" routerLinkActive="active">Cartões</a>-->
     </nav>
+
+    <button
+      *ngIf="isCustomerRegistered"
+      type="button"
+      class="logout-btn"
+      (click)="logout()"
+    >
+      Sair
+    </button>
   </aside>
 
   <main class="content">

@@ -36,7 +36,9 @@ body {
 
 .app-shell {
   display: flex;
-  min-height: 100vh;
+  // Altura fixa da viewport: toda página ocupa a mesma altura da home.
+  // Conteúdo que exceder rola dentro de .content, não na página inteira.
+  height: 100vh;
   padding: 16px;
   gap: 16px;
 }
@@ -146,6 +148,39 @@ body {
   padding-left: 12px;
 }
 
+.logout-btn {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  cursor: pointer;
+  color: rgba($white, 0.92);
+  background: rgba($orange, 0.14);
+  border: 1px solid rgba($orange, 0.35);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.logout-btn:hover,
+.logout-btn:focus-visible {
+  color: $white;
+  background: linear-gradient(180deg, rgba($orange, 0.28), rgba($orange-deep, 0.18));
+  box-shadow: 0 10px 24px rgba($orange-deep, 0.22);
+}
+
+.logout-btn:active {
+  transform: translateY(1px);
+}
+
 .content {
   flex: 1;
   padding: 28px;
@@ -163,7 +198,9 @@ body {
     0 18px 45px rgba(15, 23, 42, 0.12),
     0 0 0 1px rgba(244, 188, 94, 0.10) inset;
   position: relative;
-  overflow: hidden;
+  // Conteúdo mais alto que a viewport rola aqui dentro (e não na página).
+  overflow-x: hidden;
+  overflow-y: auto;
   animation: contentFadeIn 220ms ease-out;
 }
 
@@ -263,6 +300,9 @@ body {
 @media (max-width: 980px) {
   .app-shell {
     flex-direction: column;
+    // No mobile, sidebar e conteúdo empilham: volta a rolar a página toda.
+    height: auto;
+    min-height: 100vh;
   }
 
   .sidebar {
@@ -271,5 +311,6 @@ body {
 
   .content {
     padding: 18px;
+    overflow: visible;
   }
 }

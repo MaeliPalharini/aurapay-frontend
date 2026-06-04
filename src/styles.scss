@@ -1,1 +1,17 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* Reset global: o reset em app.scss é escopado ao componente e não atinge
+   html/body, então a margem padrão do navegador (8px) estourava a 100vh e
+   gerava rolagem na página inteira. */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}

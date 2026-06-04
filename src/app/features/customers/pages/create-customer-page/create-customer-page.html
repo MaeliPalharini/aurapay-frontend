@@ -94,6 +94,38 @@
             />
           </div>
 
+          <div class="field">
+            <label for="password">Senha</label>
+            <input
+              id="password"
+              type="password"
+              placeholder="Mínimo 6 caracteres"
+              formControlName="password"
+            />
+            <small
+              class="field-error"
+              *ngIf="form.get('password')?.touched && form.get('password')?.hasError('minlength')"
+            >
+              A senha deve ter pelo menos 6 caracteres.
+            </small>
+          </div>
+
+          <div class="field">
+            <label for="confirmPassword">Confirmar senha</label>
+            <input
+              id="confirmPassword"
+              type="password"
+              placeholder="Repita a senha"
+              formControlName="confirmPassword"
+            />
+            <small
+              class="field-error"
+              *ngIf="form.get('confirmPassword')?.touched && form.hasError('passwordMismatch')"
+            >
+              As senhas não conferem.
+            </small>
+          </div>
+
           <button class="submit-btn" type="submit" [disabled]="isSubmitting">
             <span *ngIf="!isSubmitting">Criar minha conta →</span>
             <span *ngIf="isSubmitting" class="spinner">Criando…</span>
@@ -134,13 +166,13 @@
           </div>
 
           <div class="field">
-            <label for="loginDoc">CPF</label>
+            <label for="loginPassword">Senha</label>
             <input
-              id="loginDoc"
-              type="text"
-              placeholder="000.000.000-00"
-              [(ngModel)]="loginDoc"
-              name="loginDoc"
+              id="loginPassword"
+              type="password"
+              placeholder="Sua senha"
+              [(ngModel)]="loginPassword"
+              name="loginPassword"
             />
           </div>
 

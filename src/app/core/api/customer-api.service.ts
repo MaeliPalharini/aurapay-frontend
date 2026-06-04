@@ -1,17 +1,20 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { CreateCustomerRequest } from '../../features/customers/models/create-customer-request.model';
 import { CreateCustomerResponse } from '../../features/customers/models/create-customer-response.model';
 import { GetWalletResponse } from '../../features/customers/models/get-wallet-response.model';
+import { LoginRequest, LoginResponse } from '../../features/customers/models/login.model';
+import { AuthService } from '../auth/auth.service';
 @Injectable({
   providedIn: 'root'
 })
 export class CustomerApiService {
   private readonly baseUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private auth: AuthService) {}
 
   createCustomer(payload: CreateCustomerRequest): Observable<CreateCustomerResponse> {
     return this.http.post<CreateCustomerResponse>(`${this.baseUrl}/customers`, payload);
@@ -25,10 +28,11 @@ export class CustomerApiService {
     return this.http.post<GetWalletResponse>(`${this.baseUrl}/customers/${customerId}/wallet/deposit`, { amount });
   }
 
-  login(email: string, documentNumber?: string): Observable<{ customerId: number, fullName: string, email: string }> {
-    return this.http.post<{ customerId: number, fullName: string, email: string }>(
-      `${this.baseUrl}/customers/login`,
-      { email, documentNumber }
-    );
+  // Envia { email, password } e guarda o JWT devolvido para as próximas
+  // chamadas autenticadas (ver AuthInterceptor).
+  login(payload: LoginRequest): Observable<LoginResponse> {
+    return this.http
+      .post<LoginResponse>(`${this.baseUrl}/customers/login`, payload)
+      .pipe(tap((response) => this.auth.setSession(response.token, response.customerId)));
   }
 }
