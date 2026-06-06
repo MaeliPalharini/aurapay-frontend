@@ -118,6 +118,47 @@ $danger:      #d64545;
   font-size: 0.9rem;
 }
 
+.pix-key__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pix-key__delete {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: rgba($ink, 0.45);
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+
+  .pix-key__delete-icon {
+    display: block;
+  }
+
+  &:hover:not(:disabled) {
+    color: #d64545;
+    background: rgba(#d64545, 0.10);
+    border-color: rgba(#d64545, 0.22);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.pix-key__deleting {
+  font-weight: 800;
+  color: #9e2f2f;
+}
+
 // Reutiliza alert do padrão Aura
 .alert {
   border-radius: 14px;

@@ -4,6 +4,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Subject, interval } from 'rxjs';
 import { switchMap, takeUntil } from 'rxjs/operators';
 import { PixDepositApiService } from '../../../../core/api/pix-deposit-api.service';
+import { PixTransferApiService } from '../../../../core/api/pix-transfer-api.service';
 import { environment } from '../../../../../environments/environment';
 import {
   ApiErrorResponse,
@@ -12,8 +13,11 @@ import {
   PixPaymentStatus,
   isTerminalPixStatus,
 } from '../../models/pix-deposit.models';
+import { PixTransferResponse } from '../../models/pix-transfer.models';
 
 type AreaPixViewState = 'form' | 'loading' | 'qrcode' | 'success' | 'error';
+// Aba ativa no formulário da Área Pix: cobrar (gera QR) ou enviar (transferência).
+type AreaPixMode = 'charge' | 'send';
 
 @Component({
   selector: 'app-deposit-pix-page',
@@ -26,12 +30,15 @@ type AreaPixViewState = 'form' | 'loading' | 'qrcode' | 'success' | 'error';
 })
 export class DepositPixPage implements OnInit, OnDestroy {
   viewState: AreaPixViewState = 'form';
+  mode: AreaPixMode = 'charge';
 
   form!: ReturnType<FormBuilder['group']>;
+  sendForm!: ReturnType<FormBuilder['group']>;
 
   customerId: number | null = null;
   payment: CreatePixPaymentResponse | null = null;
   finalPayment: PixPaymentResponse | null = null;
+  transferResult: PixTransferResponse | null = null;
 
   errorMessage = '';
   copied = false;
@@ -55,11 +62,16 @@ export class DepositPixPage implements OnInit, OnDestroy {
   constructor(
     private readonly fb: FormBuilder,
     private readonly pixApi: PixDepositApiService,
+    private readonly pixTransferApi: PixTransferApiService,
     private readonly cdr: ChangeDetectorRef
   ) {
     this.form = this.fb.group({
       amount: [null as number | null, [Validators.required, Validators.min(0.01)]],
       payerEmail: [''],
+    });
+    this.sendForm = this.fb.group({
+      destinationPixKey: ['', [Validators.required]],
+      amount: [null as number | null, [Validators.required, Validators.min(0.01)]],
     });
   }
 
@@ -156,6 +168,56 @@ export class DepositPixPage implements OnInit, OnDestroy {
       });
   }
 
+  // Troca a aba ativa (Receber/Enviar). Só faz sentido na tela do formulário.
+  setMode(mode: AreaPixMode): void {
+    if (this.mode === mode) return;
+    this.mode = mode;
+    this.errorMessage = '';
+    this.cdr.markForCheck();
+  }
+
+  // Envia um Pix (transferência interna) para a chave informada.
+  submitTransfer(): void {
+    if (!this.customerId) return;
+
+    if (this.sendForm.invalid) {
+      this.sendForm.markAllAsTouched();
+      return;
+    }
+
+    const amount = this.normalizeAmount(this.sendForm.value.amount);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      this.errorMessage = 'Informe um valor válido maior que zero.';
+      return;
+    }
+
+    const destinationPixKey = String(this.sendForm.value.destinationPixKey ?? '').trim();
+    if (!destinationPixKey) {
+      this.errorMessage = 'Informe a chave Pix de destino.';
+      return;
+    }
+
+    this.errorMessage = '';
+    this.viewState = 'loading';
+    this.cdr.markForCheck();
+
+    this.pixTransferApi
+      .transferPix({ customerId: this.customerId, destinationPixKey, amount })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.transferResult = response;
+          this.viewState = 'success';
+          this.cdr.markForCheck();
+        },
+        error: (error: HttpErrorResponse) => {
+          this.errorMessage = this.mapTransferErrorToMessage(error);
+          this.viewState = 'error';
+          this.cdr.markForCheck();
+        },
+      });
+  }
+
   copyKey(): void {
     const key = this.payment?.qrCode;
     if (!key) return;
@@ -215,6 +277,7 @@ export class DepositPixPage implements OnInit, OnDestroy {
     this.stopTimer();
     this.payment = null;
     this.finalPayment = null;
+    this.transferResult = null;
     this.errorMessage = '';
     this.remainingSeconds = 0;
     this.expiringSoon = false;
@@ -363,6 +426,34 @@ export class DepositPixPage implements OnInit, OnDestroy {
         return 'Sem conexão com o servidor. Verifique sua internet.';
       default:
         return apiMessage || 'Não foi possível processar a cobrança Pix.';
+    }
+  }
+
+  // Erros do envio de Pix. 422 carrega a regra de negócio do backend
+  // (saldo insuficiente, chave inexistente, transferência pra si mesmo…).
+  private mapTransferErrorToMessage(error: HttpErrorResponse): string {
+    const apiBody = error?.error as ApiErrorResponse | undefined;
+    const apiMessage = apiBody?.message;
+
+    switch (error?.status) {
+      case 400:
+        return apiMessage || 'Requisição inválida. Verifique os dados e tente novamente.';
+      case 401:
+        return 'Sessão expirada ou usuário não autenticado.';
+      case 403:
+        return 'Você não tem permissão para realizar esta transferência.';
+      case 404:
+        return apiMessage || 'Chave Pix de destino não encontrada.';
+      case 422:
+        return apiMessage || 'Não foi possível concluir a transferência.';
+      case 429:
+        return 'Muitas tentativas. Aguarde alguns instantes e tente novamente.';
+      case 500:
+        return apiMessage || 'Erro interno no servidor. Tente novamente em instantes.';
+      case 0:
+        return 'Sem conexão com o servidor. Verifique sua internet.';
+      default:
+        return apiMessage || 'Não foi possível concluir a transferência.';
     }
   }
 

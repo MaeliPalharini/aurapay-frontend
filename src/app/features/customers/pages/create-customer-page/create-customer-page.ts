@@ -32,7 +32,7 @@ export class CreateCustomerPage {
       {
         fullName: ['', [Validators.required]],
         email: ['', [Validators.required, Validators.email]],
-        documentNumber: ['', [Validators.required]],
+        documentNumber: ['', [Validators.required, CreateCustomerPage.cpfValidator]],
         password: ['', [Validators.required, Validators.minLength(6)]],
         confirmPassword: ['', [Validators.required]]
       },
@@ -50,6 +50,51 @@ export class CreateCustomerPage {
     return password === confirmPassword ? null : { passwordMismatch: true };
   }
 
+  // Validador de CPF: confere 11 dígitos e os dígitos verificadores.
+  // Erros distintos para dar feedback igual ao backend:
+  //  - cpfLength: não tem 11 dígitos numéricos
+  //  - cpfInvalid: 11 dígitos, mas dígito verificador errado / sequência repetida
+  private static cpfValidator(control: AbstractControl): ValidationErrors | null {
+    const digits = String(control.value ?? '').replace(/\D/g, '');
+    if (!digits) {
+      return null; // "required" já cuida do vazio
+    }
+    if (digits.length !== 11) {
+      return { cpfLength: true };
+    }
+    return CreateCustomerPage.isValidCpf(digits) ? null : { cpfInvalid: true };
+  }
+
+  private static isValidCpf(digits: string): boolean {
+    if (/^(\d)\1{10}$/.test(digits)) {
+      return false;
+    }
+
+    const calcCheckDigit = (length: number): number => {
+      let sum = 0;
+      for (let i = 0; i < length; i++) {
+        sum += Number(digits.charAt(i)) * (length + 1 - i);
+      }
+      const result = 11 - (sum % 11);
+      return result >= 10 ? 0 : result;
+
+
+    };
+
+    const firstDigit = calcCheckDigit(9);
+    const secondDigit = calcCheckDigit(10);
+    return firstDigit === Number(digits.charAt(9)) && secondDigit === Number(digits.charAt(10));
+  }
+
+  // Mantém apenas os 11 dígitos do CPF, sem máscara (pontos/traço).
+  onCpfInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const digits = input.value.replace(/\D/g, '').slice(0, 11);
+
+    input.value = digits;
+    this.form.get('documentNumber')?.setValue(digits, { emitEvent: false });
+  }
+
   submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -64,7 +109,8 @@ export class CreateCustomerPage {
     const payload = {
       fullName: this.form.value.fullName ?? '',
       email,
-      documentNumber: this.form.value.documentNumber ?? '',
+      // Backend exige só os 11 dígitos, sem máscara (pontos/traço).
+      documentNumber: String(this.form.value.documentNumber ?? '').replace(/\D/g, ''),
       password
     };
 

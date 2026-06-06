@@ -1,0 +1,250 @@
+// Paleta alinhada com a carteira / Área Pix
+$teal: #2a9d8f;
+$orange: #f4631e;
+$ink: #0e2724;
+$muted: #4a706c;
+$white: #ffffff;
+$danger: #d64545;
+
+:host {
+  display: block;
+}
+
+.recharge {
+  background: rgba($white, 0.96);
+  border-radius: 28px;
+  padding: 28px;
+  border: 1px solid rgba($ink, 0.05);
+  box-shadow: 0 14px 40px rgba(14, 39, 36, 0.06);
+}
+
+.recharge__header {
+  margin-bottom: 18px;
+
+  h3 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: $ink;
+  }
+
+  p {
+    margin: 6px 0 0;
+    color: $muted;
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+}
+
+.recharge__alert {
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+
+  code {
+    background: rgba($ink, 0.06);
+    padding: 1px 6px;
+    border-radius: 6px;
+    font-size: 0.85em;
+  }
+
+  &--warn {
+    background: rgba($orange, 0.10);
+    color: #9a3a12;
+    border: 1px solid rgba($orange, 0.22);
+  }
+
+  &--error {
+    background: rgba($danger, 0.08);
+    color: #9e2f2f;
+    border: 1px solid rgba($danger, 0.16);
+  }
+}
+
+// Passo 1 — valor
+.recharge__amount-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-weight: 700;
+    color: $ink;
+  }
+
+  input {
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1px solid rgba($teal, 0.25);
+    background: rgba($white, 0.95);
+    color: $ink;
+    font-size: 1.05rem;
+
+    &:focus {
+      outline: none;
+      border-color: rgba($teal, 0.55);
+      box-shadow: 0 0 0 4px rgba($teal, 0.16);
+    }
+  }
+}
+
+.recharge__field-error {
+  color: $danger;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+// Passo 2 — cartão
+.recharge__amount-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  border-radius: 14px;
+  background: rgba($teal, 0.08);
+  color: $ink;
+  font-weight: 600;
+  font-size: 0.95rem;
+
+  strong {
+    color: darken($teal, 12%);
+  }
+}
+
+.recharge__link {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: $teal;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 0.9rem;
+}
+
+.recharge__brick {
+  min-height: 220px;
+}
+
+// Estados (processando / sucesso / erro)
+.recharge__state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 18px 8px;
+
+  h4 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: $ink;
+  }
+
+  p {
+    margin: 0;
+    color: $muted;
+    line-height: 1.45;
+  }
+
+  .btn {
+    margin-top: 8px;
+  }
+}
+
+.recharge__amount-big {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: $ink;
+}
+
+.recharge__balance strong {
+  color: darken($teal, 12%);
+}
+
+.recharge__card-info {
+  font-size: 0.9rem;
+  color: $muted;
+}
+
+.recharge__check,
+.recharge__bang {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: $white;
+}
+
+.recharge__check {
+  background: linear-gradient(135deg, $teal 0%, #1f7d72 100%);
+}
+
+.recharge__bang {
+  background: linear-gradient(135deg, #e06060 0%, $danger 100%);
+}
+
+.recharge__spinner {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 4px solid rgba($teal, 0.18);
+  border-top-color: $teal;
+  animation: recharge-spin 0.8s linear infinite;
+}
+
+@keyframes recharge-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Botões (mesma linguagem da carteira)
+.btn {
+  border: none;
+  cursor: pointer;
+  font-weight: 800;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.btn-pill {
+  padding: 13px 22px;
+  border-radius: 999px;
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, $orange, darken($orange, 10%));
+  color: $white;
+  box-shadow: 0 10px 24px rgba($orange, 0.28);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 32px rgba($orange, 0.32);
+  }
+}
+
+.btn-ghost {
+  background: rgba($white, 0.9);
+  color: $ink;
+  border: 1px solid rgba($teal, 0.18);
+
+  &:hover {
+    background: rgba($teal, 0.06);
+  }
+}

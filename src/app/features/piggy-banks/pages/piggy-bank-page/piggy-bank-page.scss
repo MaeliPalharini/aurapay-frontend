@@ -9,13 +9,20 @@ $red: #d64545;
 
 :host {
   display: block;
+  // Sangra sobre o padding do .content e ocupa exatamente a altura dele,
+  // dando referência para o min-height:100% do wrapper preencher a página.
   margin: -28px;
+  height: 100%;
 }
 
 .wallet-page-wrapper {
-  min-height: 100vh;
+  // Preenche a altura do .content (que já é a mesma da sidebar). Antes era
+  // 100vh, mas como o wrapper vive DENTRO do .content — que já ocupa a
+  // viewport menos o padding do shell — isso o deixava mais alto que o
+  // container e a página "corria pra baixo".
+  min-height: 100%;
   width: 100%;
-  padding: 200px clamp(20px, 4vw, 40px) 48px;
+  padding: clamp(24px, 4vw, 40px) clamp(20px, 4vw, 40px) 48px;
   color: $ink;
   background:
     radial-gradient(circle at top right, rgba(244, 99, 30, 0.12) 0%, transparent 22%),

@@ -29,6 +29,7 @@ export class PixKeysSection implements OnChanges, OnDestroy {
   isCreating = false;
   errorMessage = '';
   copiedKeyId: number | null = null;
+  deletingKeyId: number | null = null;
 
   private readonly destroy$ = new Subject<void>();
   private copiedTimer: ReturnType<typeof setTimeout> | null = null;
@@ -80,6 +81,36 @@ export class PixKeysSection implements OnChanges, OnDestroy {
         error: (error: HttpErrorResponse) => {
           this.errorMessage = this.mapHttpErrorToMessage(error);
           this.isCreating = false;
+          this.cdr.markForCheck();
+        },
+      });
+  }
+
+  deleteKey(key: PixKeyResponse): void {
+    if (!this.customerId || this.deletingKeyId !== null) return;
+
+    const confirmed = window.confirm(
+      `Deseja realmente excluir a chave Pix?\n\n${key.keyValue}`
+    );
+    if (!confirmed) return;
+
+    this.deletingKeyId = key.id;
+    this.errorMessage = '';
+    this.cdr.markForCheck();
+
+    this.pixKeyApi
+      .deletePixKey(key.id, this.customerId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          // 204 No Content → remove a chave da lista local.
+          this.keys = this.keys.filter((k) => k.id !== key.id);
+          this.deletingKeyId = null;
+          this.cdr.markForCheck();
+        },
+        error: (error: HttpErrorResponse) => {
+          this.errorMessage = this.mapHttpErrorToMessage(error);
+          this.deletingKeyId = null;
           this.cdr.markForCheck();
         },
       });

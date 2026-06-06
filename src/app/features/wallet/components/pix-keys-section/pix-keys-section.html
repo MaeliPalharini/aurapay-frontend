@@ -39,14 +39,45 @@
           </small>
         </div>
       </div>
-      <button
-        type="button"
-        class="btn btn-pill btn-outline-ink pix-key__copy"
-        (click)="copyKey(key)"
-      >
-        <span *ngIf="copiedKeyId !== key.id">Copiar</span>
-        <span *ngIf="copiedKeyId === key.id">Copiado!</span>
-      </button>
+      <div class="pix-key__actions">
+        <button
+          type="button"
+          class="btn btn-pill btn-outline-ink pix-key__copy"
+          (click)="copyKey(key)"
+        >
+          <span *ngIf="copiedKeyId !== key.id">Copiar</span>
+          <span *ngIf="copiedKeyId === key.id">Copiado!</span>
+        </button>
+        <button
+          type="button"
+          class="pix-key__delete"
+          [disabled]="deletingKeyId !== null"
+          (click)="deleteKey(key)"
+          aria-label="Excluir chave Pix"
+          title="Excluir chave Pix"
+        >
+          <svg
+            *ngIf="deletingKeyId !== key.id"
+            class="pix-key__delete-icon"
+            viewBox="0 0 24 24"
+            width="30"
+            height="30"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M3 6h18" />
+            <path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" />
+            <path d="M6 6l1 14a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-14" />
+            <path d="M10 11v6" />
+            <path d="M14 11v6" />
+          </svg>
+          <span *ngIf="deletingKeyId === key.id" class="pix-key__deleting">…</span>
+        </button>
+      </div>
     </li>
   </ul>
 </section>

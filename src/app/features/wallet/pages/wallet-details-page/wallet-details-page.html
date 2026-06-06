@@ -44,8 +44,10 @@
                 <button class="btn btn-pill btn-primary" (click)="openAddFunds()">
                   + Adicionar saldo
                 </button>
+                <a class="btn btn-pill btn-outline" routerLink="/cartoes">Meus cartões</a>
                 <a class="btn btn-pill btn-outline" routerLink="/pix">Área Pix</a>
                 <a class="btn btn-pill btn-outline" routerLink="/cofrinhos">Poupar</a>
+                <a class="btn btn-pill btn-outline" routerLink="/extrato">Extrato</a>
               </div>
             </div>
           </div>
@@ -54,20 +56,38 @@
         <section class="activities-section">
           <div class="section-header">
             <h3>Atividades recentes</h3>
-            <a href="#" class="link-btn">Ver tudo</a>
+            <a routerLink="/extrato" class="link-btn">Ver tudo</a>
           </div>
 
           <div class="activity-list">
-            <div class="activity-item">
-              <div class="icon-circle in">↓</div>
-              <div class="activity-details">
-                <p class="activity-title">Depósito recebido</p>
-                <p class="activity-meta">Hoje, 10:30</p>
-              </div>
-              <span class="activity-amount positive">+ R$ 150,00</span>
+            <div class="activity-empty" *ngIf="isLoadingActivities">
+              Carregando atividades...
             </div>
 
-            <div class="activity-empty" *ngIf="false">
+            <div
+              class="activity-item"
+              *ngFor="let tx of recentActivities; trackBy: trackByActivityId"
+            >
+              <div class="icon-circle" [class.in]="tx.direction === 'CREDIT'">
+                {{ activityIcon(tx.type) }}
+              </div>
+              <div class="activity-details">
+                <p class="activity-title">{{ tx.description }}</p>
+                <p class="activity-meta">{{ tx.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
+              </div>
+              <span
+                class="activity-amount"
+                [class.positive]="tx.direction === 'CREDIT'"
+                [class.negative]="tx.direction === 'DEBIT'"
+              >
+                {{ formatActivityAmount(tx) }}
+              </span>
+            </div>
+
+            <div
+              class="activity-empty"
+              *ngIf="!isLoadingActivities && recentActivities.length === 0"
+            >
               Sem movimentações recentes.
             </div>
           </div>
@@ -75,14 +95,6 @@
       </main>
 
       <aside class="wallet-sidebar">
-        <div class="card-widget">
-          <h4>Meu Cartão</h4>
-          <div class="card-preview">
-            <p class="card-brand">AuraPay</p>
-            <p class="card-number">**** **** **** 4589</p>
-          </div>
-        </div>
-
         <div class="goal-widget">
           <h4>Cofrinho</h4>
           <div class="goal-content">

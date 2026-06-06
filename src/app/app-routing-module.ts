@@ -5,12 +5,16 @@ import { WalletDetailsPage } from './features/wallet/pages/wallet-details-page/w
 import { PiggyBankPage } from './features/piggy-banks/pages/piggy-bank-page/piggy-bank-page';
 import { PiggyBankDetailsPage } from './features/piggy-banks/pages/piggy-bank-details-page/piggy-bank-details-page';
 import { DepositPixPage } from './features/wallet/pages/deposit-pix-page/deposit-pix-page';
+import { ExtratoPage } from './features/wallet/pages/extrato-page/extrato-page';
+import { CardsPage } from './features/wallet/pages/cards-page/cards-page';
 
 const routes: Routes = [
   { path: '', redirectTo: 'customers/new', pathMatch: 'full' },
   { path: 'customers/new', component: CreateCustomerPage },
   { path: 'wallet', component: WalletDetailsPage },
+  { path: 'cartoes', component: CardsPage },
   { path: 'pix', component: DepositPixPage },
+  { path: 'extrato', component: ExtratoPage },
   { path: 'cofrinhos', component: PiggyBankPage },
   { path: 'cofrinhos/:id', component: PiggyBankDetailsPage },
   { path: 'deposits/pix', redirectTo: 'pix', pathMatch: 'full' },

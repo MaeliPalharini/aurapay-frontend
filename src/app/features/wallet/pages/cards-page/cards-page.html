@@ -1,0 +1,55 @@
+<div class="cards-page-wrapper">
+  <div class="cards-page">
+
+    <header class="cards-header">
+      <h2>Meus cartões</h2>
+      <p>Gerencie seus cartões e recarregue sua carteira com segurança.</p>
+    </header>
+
+    <div class="alert alert-success" *ngIf="successMessage">{{ successMessage }}</div>
+    <div class="alert alert-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+    <div class="cards-grid">
+      <!-- Coluna esquerda: pilha de cartões coloridos -->
+      <section class="cards-stack-col">
+        <div class="card-widget">
+          <h4>Cartões cadastrados</h4>
+          <div
+            class="card-stack"
+            [style.height.px]="172 + (cards.length - 1) * 44"
+          >
+            <button
+              *ngFor="let card of cards; let i = index"
+              type="button"
+              class="card-preview"
+              [ngClass]="'theme-' + card.theme"
+              [class.active]="i === activeCardIndex"
+              [style.--stack-index]="i"
+              [style.--active-index]="activeCardIndex"
+              (click)="selectCard(i)"
+            >
+              <div class="card-top">
+                <span class="card-chip" aria-hidden="true"></span>
+                <span class="card-flag" [ngClass]="'flag-' + card.flag">
+                  {{ card.flag === 'visa' ? 'VISA' : 'mastercard' }}
+                </span>
+              </div>
+              <p class="card-brand">{{ card.brand }}</p>
+              <p class="card-number">**** **** **** {{ card.last4 }}</p>
+            </button>
+          </div>
+
+          <a class="btn btn-pill btn-outline" routerLink="/wallet">← Voltar para a carteira</a>
+        </div>
+      </section>
+
+      <!-- Coluna direita: recarga por cartão -->
+      <aside class="cards-recharge-col">
+        <app-card-recharge
+          [customerId]="customerId"
+          (approved)="onCardDepositApproved($event)"
+        ></app-card-recharge>
+      </aside>
+    </div>
+  </div>
+</div>

@@ -1,9 +1,16 @@
 <div class="pix-page-wrapper">
   <div class="pix-page">
 
-    <header class="pix-header">
-      <h2>Área Pix</h2>
-      <p>Adicione saldo à sua carteira AuraPay em segundos via Pix.</p>
+    <header class="pix-header pix-hero">
+      <img
+        class="pix-hero__img"
+        src="images/pix.jpg"
+        alt="Pessoa pagando por aproximação com QR Code Pix no celular"
+      />
+      <div class="pix-hero__overlay">
+        <h2>Área Pix</h2>
+        <p>Envie e receba dinheiro na sua carteira AuraPay em segundos via Pix.</p>
+      </div>
     </header>
 
     <!-- Chaves Pix do usuário (visível só na tela do formulário) -->
@@ -14,42 +21,111 @@
 
     <!-- Estado: Formulário -->
     <section class="pix-card" *ngIf="viewState === 'form'">
-      <header class="pix-form__header">
-        <h3>Cobrar via Pix</h3>
-      </header>
+      <!-- Abas: Receber (gera QR) / Enviar (transferência) -->
+      <div class="pix-tabs" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          class="pix-tab"
+          [class.active]="mode === 'charge'"
+          [attr.aria-selected]="mode === 'charge'"
+          (click)="setMode('charge')"
+        >
+          Receber
+        </button>
+        <button
+          type="button"
+          role="tab"
+          class="pix-tab"
+          [class.active]="mode === 'send'"
+          [attr.aria-selected]="mode === 'send'"
+          (click)="setMode('send')"
+        >
+          Enviar
+        </button>
+      </div>
 
-      <form class="pix-form" [formGroup]="form" (ngSubmit)="submit()">
-        <label>
-          Valor da cobrança
-          <input type="number" min="0.01" step="0.01" formControlName="amount" placeholder="Ex.: 25,50" />
-          <small class="field-error" *ngIf="form.get('amount')?.touched && form.get('amount')?.invalid">
-            Informe um valor maior que zero.
-          </small>
-        </label>
+      <!-- Aba Receber: gera cobrança/QR Code -->
+      <ng-container *ngIf="mode === 'charge'">
+        <header class="pix-form__header">
+          <h3>Receber via Pix</h3>
+          <p>Gere um QR Code para receber saldo na sua carteira.</p>
+        </header>
 
-        <label>
-          E-mail do pagador (opcional)
-          <input type="email" formControlName="payerEmail" placeholder="seu-email@exemplo.com" />
-          <small class="field-hint">
-            Se preenchido, o Mercado Pago usa este e-mail para a cobrança.
-          </small>
-        </label>
+        <form class="pix-form" [formGroup]="form" (ngSubmit)="submit()">
+          <label>
+            Valor da cobrança
+            <input type="number" min="0.01" step="0.01" formControlName="amount" placeholder="Ex.: 25,50" />
+            <small class="field-error" *ngIf="form.get('amount')?.touched && form.get('amount')?.invalid">
+              Informe um valor maior que zero.
+            </small>
+          </label>
 
-        <div class="alert alert-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+          <label>
+            E-mail do pagador
+            <input type="email" formControlName="payerEmail" placeholder="seu-email@exemplo.com" />
+            <small class="field-hint">
+              Se preenchido, o Mercado Pago usa este e-mail para a cobrança.
+            </small>
+          </label>
 
-        <div class="pix-actions">
-          <a class="btn btn-pill btn-ghost" routerLink="/wallet">Voltar</a>
-          <button class="btn btn-pill btn-primary" type="submit" [disabled]="form.invalid">
-            Gerar cobrança Pix
-          </button>
-        </div>
-      </form>
+          <div class="alert alert-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+          <div class="pix-actions">
+            <a class="btn btn-pill btn-ghost" routerLink="/wallet">Voltar</a>
+            <button class="btn btn-pill btn-primary" type="submit" [disabled]="form.invalid">
+              Gerar cobrança Pix
+            </button>
+          </div>
+        </form>
+      </ng-container>
+
+      <!-- Aba Enviar: transferência interna por chave Pix -->
+      <ng-container *ngIf="mode === 'send'">
+        <header class="pix-form__header">
+          <h3>Enviar via Pix</h3>
+          <p>Transfira para outra conta AuraPay usando a chave Pix de destino.</p>
+        </header>
+
+        <form class="pix-form" [formGroup]="sendForm" (ngSubmit)="submitTransfer()">
+          <label>
+            Chave Pix de destino
+            <input type="text" formControlName="destinationPixKey" placeholder="E-mail, CPF, telefone ou chave aleatória" />
+            <small
+              class="field-error"
+              *ngIf="sendForm.get('destinationPixKey')?.touched && sendForm.get('destinationPixKey')?.invalid"
+            >
+              Informe a chave Pix de quem vai receber.
+            </small>
+          </label>
+
+          <label>
+            Valor a enviar
+            <input type="number" min="0.01" step="0.01" formControlName="amount" placeholder="Ex.: 25,50" />
+            <small
+              class="field-error"
+              *ngIf="sendForm.get('amount')?.touched && sendForm.get('amount')?.invalid"
+            >
+              Informe um valor maior que zero.
+            </small>
+          </label>
+
+          <div class="alert alert-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+          <div class="pix-actions">
+            <a class="btn btn-pill btn-ghost" routerLink="/wallet">Voltar</a>
+            <button class="btn btn-pill btn-primary" type="submit" [disabled]="sendForm.invalid">
+              Enviar Pix
+            </button>
+          </div>
+        </form>
+      </ng-container>
     </section>
 
     <!-- Estado: Loading -->
     <section class="pix-card pix-card--center" *ngIf="viewState === 'loading'">
       <div class="loader-ring" aria-hidden="true"></div>
-      <p class="loading-text">Gerando QR Code…</p>
+      <p class="loading-text">{{ mode === 'send' ? 'Enviando Pix…' : 'Gerando QR Code…' }}</p>
     </section>
 
     <!-- Estado: QR Code pronto -->
@@ -107,8 +183,42 @@
       </div>
     </section>
 
-    <!-- Estado: Sucesso -->
-    <section class="pix-card pix-card--center" *ngIf="viewState === 'success' && finalPayment">
+    <!-- Estado: Sucesso (Enviar) -->
+    <section
+      class="pix-card pix-card--center"
+      *ngIf="viewState === 'success' && mode === 'send' && transferResult"
+    >
+      <div class="status-icon status-icon--success" aria-hidden="true">✓</div>
+      <h3>Pix enviado!</h3>
+      <p class="success-amount">{{ transferResult.amount | currency:'BRL' }} enviados via Pix.</p>
+      <p class="success-message">A transferência foi concluída com sucesso.</p>
+
+      <dl class="receipt">
+        <div>
+          <dt>Chave de destino</dt>
+          <dd>{{ transferResult.destinationPixKey }}</dd>
+        </div>
+        <div>
+          <dt>Saldo após o envio</dt>
+          <dd>{{ transferResult.senderBalance | currency:'BRL' }}</dd>
+        </div>
+        <div *ngIf="transferResult.createdAt">
+          <dt>Enviado em</dt>
+          <dd>{{ transferResult.createdAt | date:'dd/MM/yyyy HH:mm' }}</dd>
+        </div>
+      </dl>
+
+      <div class="pix-actions pix-actions--center">
+        <button class="btn btn-pill btn-ghost" type="button" (click)="retry()">Novo Pix</button>
+        <a class="btn btn-pill btn-primary" routerLink="/wallet">Ver saldo</a>
+      </div>
+    </section>
+
+    <!-- Estado: Sucesso (Receber) -->
+    <section
+      class="pix-card pix-card--center"
+      *ngIf="viewState === 'success' && mode === 'charge' && finalPayment"
+    >
       <div class="status-icon status-icon--success" aria-hidden="true">✓</div>
       <h3>Saldo adicionado!</h3>
       <p class="success-amount">{{ finalPayment.amount | currency:'BRL' }} adicionados à sua carteira.</p>

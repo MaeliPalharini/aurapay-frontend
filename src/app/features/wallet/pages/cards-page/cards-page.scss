@@ -1,0 +1,237 @@
+// Paleta extraída da identidade Aura (alinhada à carteira)
+$teal:        #2A9D8F;
+$orange:      #F4631E;
+$ink:         #0E2724;
+$muted:       #4A706C;
+$white:       #FFFFFF;
+
+:host {
+  display: block;
+  margin: -28px;
+}
+
+.cards-page-wrapper {
+  min-height: 100vh;
+  padding: 32px clamp(20px, 4vw, 40px) 48px;
+  color: $ink;
+  background:
+    radial-gradient(circle at top right, rgba($orange, 0.12) 0%, transparent 22%),
+    radial-gradient(circle at left center, rgba($teal, 0.12) 0%, transparent 26%),
+    linear-gradient(180deg, #eef8f6 0%, #dcedea 100%);
+}
+
+.cards-page {
+  width: min(1100px, 100%);
+  margin: 60px auto;
+  padding: clamp(20px, 3vw, 36px);
+  border-radius: 32px;
+  background: rgba($white, 0.42);
+  border: 1px solid rgba($white, 0.8);
+  box-shadow: 0 24px 80px rgba(14, 39, 36, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.cards-header {
+  text-align: center;
+  margin-bottom: 28px;
+
+  h2 {
+    margin: 0;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    color: $ink;
+    letter-spacing: -0.03em;
+  }
+
+  p {
+    margin: 10px 0 0;
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    line-height: 1.3;
+    color: $muted;
+  }
+}
+
+.alert {
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  font-weight: 600;
+
+  &.alert-success {
+    background: rgba($teal, 0.10);
+    color: darken($teal, 18%);
+    border: 1px solid rgba($teal, 0.16);
+  }
+
+  &.alert-error {
+    background: rgba(#d64545, 0.08);
+    color: #9e2f2f;
+    border: 1px solid rgba(#d64545, 0.14);
+  }
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.card-widget {
+  background: rgba($white, 0.94);
+  border-radius: 24px;
+  padding: 24px;
+  border: 1px solid rgba($ink, 0.05);
+  box-shadow: 0 14px 40px rgba(14, 39, 36, 0.06);
+
+  h4 {
+    margin: 0 0 18px;
+    color: $ink;
+    font-size: 1.1rem;
+    font-weight: 800;
+  }
+}
+
+// Pilha de cartões estilo carteira: cada cartão espia 44px abaixo do anterior.
+// Clicar num cartão o traz para a frente (z-index alto) com um leve destaque.
+.card-stack {
+  position: relative;
+  width: 100%;
+  transition: height 0.35s ease;
+  margin-bottom: 24px;
+}
+
+.card-preview {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--stack-index) * 44px);
+  height: 172px;
+  border-radius: 20px;
+  padding: 20px 22px;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: $white;
+  z-index: var(--stack-index);
+  box-shadow: 0 12px 26px rgba(13, 61, 57, 0.22);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+
+  &.active {
+    z-index: 100;
+    transform: translateY(-6px) scale(1.015);
+    box-shadow: 0 22px 44px rgba(13, 61, 57, 0.3);
+  }
+
+  &:not(.active):hover {
+    transform: translateY(-3px);
+  }
+
+  &.theme-teal {
+    background: linear-gradient(135deg, #0d3d39 0%, #16675f 100%);
+  }
+  &.theme-purple {
+    background: linear-gradient(135deg, #4b1d8f 0%, #8a2be2 100%);
+  }
+  // Itaú — laranja característico
+  &.theme-orange {
+    background: linear-gradient(135deg, #d35400 0%, #ec7000 100%);
+  }
+  // Santander — vermelho característico
+  &.theme-red {
+    background: linear-gradient(135deg, #b50000 0%, #ec0000 100%);
+  }
+  &.theme-dark {
+    background: linear-gradient(135deg, #1c1c28 0%, #3a3a52 100%);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-chip {
+    width: 38px;
+    height: 28px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #f7e7a8 0%, #d9b65a 100%);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+  }
+
+  .card-flag {
+    font-weight: 800;
+    letter-spacing: 0.04em;
+
+    &.flag-visa {
+      font-style: italic;
+      font-size: 1.15rem;
+    }
+    &.flag-mastercard {
+      text-transform: lowercase;
+      font-size: 0.95rem;
+      opacity: 0.95;
+    }
+  }
+
+  .card-brand {
+    margin: 0;
+    color: $white;
+    font-size: 1.2rem;
+    font-weight: 800;
+  }
+
+  .card-number {
+    margin: 0;
+    color: rgba($white, 0.82);
+    letter-spacing: 0.18em;
+    font-size: 0.95rem;
+  }
+}
+
+.btn {
+  border: none;
+  cursor: pointer;
+  transition: 0.2s ease;
+  font-weight: 800;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.btn-pill {
+  padding: 13px 22px;
+  border-radius: 999px;
+}
+
+.btn-outline {
+  width: 100%;
+  background: rgba($teal, 0.08);
+  color: darken($teal, 12%);
+  border: 1px solid rgba($teal, 0.22);
+
+  &:hover {
+    background: rgba($teal, 0.14);
+  }
+}
+
+@media (max-width: 880px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  :host {
+    margin: -16px;
+  }
+
+  .cards-page {
+    margin: 24px auto;
+    padding: 18px;
+    border-radius: 24px;
+  }
+}

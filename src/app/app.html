@@ -5,11 +5,12 @@
     </div>
 
     <nav class="sidebar-nav">
-      <a routerLink="/customers/new" routerLinkActive="active">Início</a>
+      <a *ngIf="!isCustomerRegistered" routerLink="/customers/new" routerLinkActive="active">Início</a>
       <a routerLink="/wallet" routerLinkActive="active">Minha carteira</a>
+      <a routerLink="/cartoes" routerLinkActive="active">Meus cartões</a>
       <a routerLink="/cofrinhos" routerLinkActive="active">Cofrinho</a>
       <a routerLink="/pix" routerLinkActive="active">Área Pix</a>
-<!--      <a routerLink="/pix" routerLinkActive="active">Cartões</a>-->
+      <a routerLink="/extrato" routerLinkActive="active">Extrato</a>
     </nav>
 
     <button

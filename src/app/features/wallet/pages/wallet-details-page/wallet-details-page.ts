@@ -3,7 +3,19 @@ import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, Validators } from '@angular/forms';
 import { CustomerApiService } from '../../../../core/api/customer-api.service';
 import { GetWalletResponse } from '../../../customers/models/get-wallet-response.model';
+import {
+  ExtratoTransaction,
+  ExtratoTransactionType,
+} from '../../models/extrato.model';
 import { finalize } from 'rxjs/operators';
+
+// Ícone exibido em "Atividades recentes" por tipo de movimentação.
+const ACTIVITY_ICON: Record<ExtratoTransactionType, string> = {
+  DEPOSIT: '↓',
+  PIX_RECEIVED: '⚡',
+  PIGGY_BANK_DEPOSIT: '🐷',
+  PIGGY_BANK_WITHDRAW: '🏦',
+};
 
 @Component({
   selector: 'app-wallet-details-page',
@@ -16,6 +28,10 @@ export class WalletDetailsPage implements OnInit {
   isLoading = true;
   errorMessage = '';
   successMessage = '';
+
+  // Atividades recentes reais (vindas do extrato), as mais recentes primeiro.
+  recentActivities: ExtratoTransaction[] = [];
+  isLoadingActivities = false;
 
   customerId: number | null = null;
 
@@ -47,6 +63,53 @@ export class WalletDetailsPage implements OnInit {
       return;
     }
     this.loadWallet();
+    this.loadRecentActivities();
+  }
+
+  // Busca as movimentações reais do extrato e mostra as mais recentes.
+  loadRecentActivities(): void {
+    if (!this.customerId) return;
+
+    this.isLoadingActivities = true;
+    this.cdr.markForCheck();
+
+    this.customerApiService
+      .getExtrato(this.customerId)
+      .pipe(
+        finalize(() => {
+          this.isLoadingActivities = false;
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe({
+        next: (response) => {
+          // A lista já vem da mais recente pra mais antiga; mostra só as 2 primeiras.
+          this.recentActivities = (response.transactions ?? []).slice(0, 2);
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          // Falha aqui não deve quebrar a página da carteira.
+          this.recentActivities = [];
+          this.cdr.markForCheck();
+        },
+      });
+  }
+
+  activityIcon(type: ExtratoTransactionType): string {
+    return ACTIVITY_ICON[type] ?? '💳';
+  }
+
+  formatActivityAmount(tx: ExtratoTransaction): string {
+    const sinal = tx.direction === 'CREDIT' ? '+' : '-';
+    const valor = new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(tx.amount ?? 0);
+    return `${sinal} ${valor}`;
+  }
+
+  trackByActivityId(_index: number, tx: ExtratoTransaction): string {
+    return tx.id;
   }
 
   loadWallet(): void {

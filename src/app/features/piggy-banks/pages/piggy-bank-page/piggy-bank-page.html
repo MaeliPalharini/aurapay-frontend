@@ -55,7 +55,7 @@
     </div>
 
     <div class="alert alert-success" *ngIf="successMessage">{{ successMessage }}</div>
-    <div class="alert alert-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+    <div class="alert alert-error" *ngIf="errorMessage && !isAnyModalOpen">{{ errorMessage }}</div>
 
     <section class="wallet-card-section" *ngIf="!isLoadingList && piggyBanks.length === 0">
       <div class="wallet-state">
@@ -194,6 +194,8 @@
       />
     </label>
 
+    <div class="alert alert-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
     <div class="modal-actions">
       <button
         type="button"
@@ -242,6 +244,8 @@
       />
     </label>
 
+    <div class="alert alert-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
     <div class="modal-actions">
       <button
         type="button"
@@ -289,6 +293,8 @@
         placeholder="Ex: 10.00"
       />
     </label>
+
+    <div class="alert alert-error" *ngIf="errorMessage">{{ errorMessage }}</div>
 
     <div class="modal-actions">
       <button

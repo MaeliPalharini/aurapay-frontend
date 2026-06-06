@@ -36,6 +36,12 @@ export class PiggyBankPage implements OnInit {
   isWithdrawOpen = false;
   isDeleteOpen = false;
 
+  // Há algum modal aberto? Usado para mostrar erros DENTRO do modal e
+  // suprimir o alerta do topo da página (que ficava atrás do modal).
+  get isAnyModalOpen(): boolean {
+    return this.isCreateOpen || this.isDepositOpen || this.isWithdrawOpen || this.isDeleteOpen;
+  }
+
   walletBalance: number | null = null;
   walletStatus: string | null = null;
 

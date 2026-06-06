@@ -1,0 +1,76 @@
+<div class="extrato-page-wrapper">
+  <div class="extrato-layout">
+
+  <img
+    class="extrato-hero-art"
+    src="images/extrato.jpg"
+    alt="Ilustração de uma pessoa revisando o extrato"
+  />
+
+  <div class="extrato-page">
+
+    <header class="extrato-header">
+      <div class="extrato-header-text">
+        <h2>Extrato</h2>
+        <p>Acompanhe todas as movimentações da sua carteira.</p>
+
+        <button
+          type="button"
+          class="btn btn-pill btn-outline refresh-btn"
+          (click)="loadExtrato()"
+          [disabled]="isLoading"
+        >
+          <span class="refresh-icon" [class.spinning]="isLoading">↻</span> Atualizar
+        </button>
+      </div>
+    </header>
+
+    <!-- Cabeçalho: saldo atual -->
+    <section class="balance-card" *ngIf="extrato && !isLoading && !errorMessage">
+      <span class="balance-label">SALDO ATUAL</span>
+      <strong class="balance-value">{{ formatBRL(extrato.saldoAtual) }}</strong>
+    </section>
+
+    <div *ngIf="isLoading" class="extrato-state extrato-state--loading">
+      Carregando extrato...
+    </div>
+
+    <div *ngIf="!isLoading && errorMessage" class="extrato-state extrato-state--error">
+      <p>{{ errorMessage }}</p>
+      <button type="button" class="btn btn-pill btn-primary" (click)="loadExtrato()">
+        Tentar de novo
+      </button>
+    </div>
+
+    <section class="transactions-section" *ngIf="!isLoading && !errorMessage && extrato">
+      <!-- Lista vazia -->
+      <div *ngIf="extrato.transactions.length === 0" class="extrato-state extrato-state--empty">
+        Nenhuma movimentação ainda
+      </div>
+
+      <ul class="transaction-list" *ngIf="extrato.transactions.length > 0">
+        <li
+          class="transaction-item"
+          *ngFor="let tx of extrato.transactions; trackBy: trackByTransactionId"
+        >
+          <div class="transaction-icon" aria-hidden="true">{{ iconePorTipo(tx.type) }}</div>
+
+          <div class="transaction-details">
+            <p class="transaction-description">{{ tx.description }}</p>
+            <p class="transaction-date">{{ formatData(tx.createdAt) }}</p>
+          </div>
+
+          <span
+            class="transaction-amount"
+            [class.credit]="tx.direction === 'CREDIT'"
+            [class.debit]="tx.direction === 'DEBIT'"
+          >
+            {{ formatAmount(tx) }}
+          </span>
+        </li>
+      </ul>
+    </section>
+
+  </div>
+  </div>
+</div>

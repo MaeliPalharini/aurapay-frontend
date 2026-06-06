@@ -1,0 +1,87 @@
+<section class="recharge">
+  <header class="recharge__header">
+    <h3>Recarregar com cartão</h3>
+    <p>Adicione saldo na carteira pagando com cartão de crédito.</p>
+  </header>
+
+  <!-- Public Key não configurada -->
+  <div class="recharge__alert recharge__alert--warn" *ngIf="publicKeyMissing">
+    Configure a <strong>Public Key de teste</strong> do Mercado Pago em
+    <code>environment.mercadoPagoPublicKey</code> para habilitar a recarga por cartão.
+  </div>
+
+  <ng-container *ngIf="!publicKeyMissing">
+    <!-- Passo 1: valor -->
+    <form
+      class="recharge__amount-form"
+      *ngIf="view === 'amount'"
+      [formGroup]="amountForm"
+      (ngSubmit)="startCardStep()"
+    >
+      <label>
+        Quanto deseja recarregar?
+        <input
+          type="number"
+          min="0.01"
+          step="0.01"
+          formControlName="amount"
+          placeholder="Ex.: 50,00"
+        />
+        <small
+          class="recharge__field-error"
+          *ngIf="amountForm.get('amount')?.touched && amountForm.get('amount')?.invalid"
+        >
+          Informe um valor maior que zero.
+        </small>
+      </label>
+      <button class="btn btn-pill btn-primary" type="submit">Continuar</button>
+    </form>
+
+    <!-- Passo 2: cartão (CardPayment Brick) -->
+    <div class="recharge__card" *ngIf="view === 'card'">
+      <div class="recharge__amount-pill">
+        Recarga de <strong>{{ amount | currency: 'BRL' }}</strong>
+        <button type="button" class="recharge__link" (click)="changeAmount()">trocar valor</button>
+      </div>
+
+      <div class="recharge__alert recharge__alert--error" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <!-- O SDK do Mercado Pago renderiza os campos do cartão aqui dentro -->
+      <div [id]="containerId" class="recharge__brick"></div>
+    </div>
+
+    <!-- Processando (PENDING) -->
+    <div class="recharge__state" *ngIf="view === 'processing'">
+      <div class="recharge__spinner" aria-hidden="true"></div>
+      <h4>Processando pagamento…</h4>
+      <p>Seu pagamento está em análise. Assim que for aprovado, o saldo será creditado.</p>
+      <button class="btn btn-pill btn-ghost" type="button" (click)="reset()">Voltar</button>
+    </div>
+
+    <!-- Sucesso (APPROVED) -->
+    <div class="recharge__state recharge__state--success" *ngIf="view === 'success' && result">
+      <div class="recharge__check" aria-hidden="true">✓</div>
+      <h4>Recarga aprovada!</h4>
+      <p class="recharge__amount-big">{{ amount | currency: 'BRL' }} adicionados à carteira.</p>
+      <p class="recharge__balance" *ngIf="result.balance != null">
+        Novo saldo: <strong>{{ result.balance | currency: 'BRL' }}</strong>
+      </p>
+      <p class="recharge__card-info" *ngIf="result.brand && result.last4">
+        Pago com {{ result.brand }} •••• {{ result.last4 }}
+      </p>
+      <button class="btn btn-pill btn-primary" type="button" (click)="reset()">
+        Recarregar de novo
+      </button>
+    </div>
+
+    <!-- Erro fatal (SDK, sessão, etc.) -->
+    <div class="recharge__state recharge__state--error" *ngIf="view === 'error'">
+      <div class="recharge__bang" aria-hidden="true">!</div>
+      <h4>Não foi possível recarregar</h4>
+      <p>{{ errorMessage || 'Tente novamente em instantes.' }}</p>
+      <button class="btn btn-pill btn-primary" type="button" (click)="reset()">Tentar de novo</button>
+    </div>
+  </ng-container>
+</section>

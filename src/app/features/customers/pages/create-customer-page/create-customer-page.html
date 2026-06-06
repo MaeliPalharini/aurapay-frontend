@@ -89,9 +89,25 @@
             <input
               id="documentNumber"
               type="text"
-              placeholder="000.000.000-00"
+              inputmode="numeric"
+              autocomplete="off"
+              maxlength="11"
+              placeholder="Somente números"
               formControlName="documentNumber"
+              (input)="onCpfInput($event)"
             />
+            <small
+              class="field-error"
+              *ngIf="form.get('documentNumber')?.touched && form.get('documentNumber')?.hasError('cpfLength')"
+            >
+              O CPF deve conter 11 dígitos numéricos.
+            </small>
+            <small
+              class="field-error"
+              *ngIf="form.get('documentNumber')?.touched && form.get('documentNumber')?.hasError('cpfInvalid')"
+            >
+              CPF inválido. Confira os números digitados.
+            </small>
           </div>
 
           <div class="field">

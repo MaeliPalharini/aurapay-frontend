@@ -1,6 +1,9 @@
-import { NgModule, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { NgModule, LOCALE_ID, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { CommonModule } from '@angular/common';
+import { CommonModule, registerLocaleData } from '@angular/common';
+import localePt from '@angular/common/locales/pt';
+
+registerLocaleData(localePt, 'pt-BR');
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
@@ -12,9 +15,11 @@ import { WalletDetailsPage } from './features/wallet/pages/wallet-details-page/w
 import { PiggyBankPage } from './features/piggy-banks/pages/piggy-bank-page/piggy-bank-page';
 import { PiggyBankDetailsPage } from './features/piggy-banks/pages/piggy-bank-details-page/piggy-bank-details-page';
 import { DepositPixPage } from './features/wallet/pages/deposit-pix-page/deposit-pix-page';
+import { ExtratoPage } from './features/wallet/pages/extrato-page/extrato-page';
+import { CardsPage } from './features/wallet/pages/cards-page/cards-page';
 import { PixKeysSection } from './features/wallet/components/pix-keys-section/pix-keys-section';
+import { CardRecharge } from './features/wallet/components/card-recharge/card-recharge';
 
-// @ts-ignore
 @NgModule({
   declarations: [
     App,
@@ -23,7 +28,10 @@ import { PixKeysSection } from './features/wallet/components/pix-keys-section/pi
     PiggyBankPage,
     PiggyBankDetailsPage,
     DepositPixPage,
-    PixKeysSection
+    ExtratoPage,
+    CardsPage,
+    PixKeysSection,
+    CardRecharge
   ],
   imports: [
     BrowserModule,
@@ -35,7 +43,8 @@ import { PixKeysSection } from './features/wallet/components/pix-keys-section/pi
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideHttpClient(withInterceptorsFromDi()),
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: LOCALE_ID, useValue: 'pt-BR' }
   ],
   bootstrap: [App]
 })

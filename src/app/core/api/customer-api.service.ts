@@ -7,6 +7,11 @@ import { CreateCustomerRequest } from '../../features/customers/models/create-cu
 import { CreateCustomerResponse } from '../../features/customers/models/create-customer-response.model';
 import { GetWalletResponse } from '../../features/customers/models/get-wallet-response.model';
 import { LoginRequest, LoginResponse } from '../../features/customers/models/login.model';
+import { ExtratoResponse } from '../../features/wallet/models/extrato.model';
+import {
+  CardDepositRequest,
+  CardDepositResponse,
+} from '../../features/wallet/models/card-deposit.models';
 import { AuthService } from '../auth/auth.service';
 @Injectable({
   providedIn: 'root'
@@ -26,6 +31,21 @@ export class CustomerApiService {
 
   depositToWallet(customerId: number, amount: number): Observable<GetWalletResponse> {
     return this.http.post<GetWalletResponse>(`${this.baseUrl}/customers/${customerId}/wallet/deposit`, { amount });
+  }
+
+  // Recarga via cartão (Mercado Pago). O Bearer JWT é injetado pelo
+  // AuthInterceptor. O front envia só o token do cartão, nunca o número.
+  cardDeposit(customerId: number, payload: CardDepositRequest): Observable<CardDepositResponse> {
+    return this.http.post<CardDepositResponse>(
+      `${this.baseUrl}/customers/${customerId}/wallet/card-deposit`,
+      payload
+    );
+  }
+
+  // Extrato da carteira. O AuthInterceptor injeta o Bearer token e trata
+  // 401/403 (logout + volta pro login) automaticamente.
+  getExtrato(customerId: number): Observable<ExtratoResponse> {
+    return this.http.get<ExtratoResponse>(`${this.baseUrl}/customers/${customerId}/extrato`);
   }
 
   // Envia { email, password } e guarda o JWT devolvido para as próximas
